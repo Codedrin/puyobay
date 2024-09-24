@@ -1,15 +1,19 @@
-import { useState } from 'react'
-
-import './App.css'
-
-function App() {
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
+import '../index.css';
 
 
+
+import Signin from './views/pages/Signin.jsx';
+// import Signup from './views/pages/Signup.jsx';
+const App = () => {
   return (
-    <>
-   <div><h1>Hello Puyobay</h1></div>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Signin />} />
+        </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
