@@ -1,0 +1,84 @@
+import React, { useEffect, useState } from 'react';
+import AdminPageNavbar from '../../../constants/AdminPageNavbar';
+import axios from 'axios';
+
+const Admin = () => {
+  const [landlords, setLandlords] = useState([]);
+  const [tenants, setTenants] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users'); // Adjust URL if needed
+        setLandlords(response.data.landlords);
+        setTenants(response.data.tenants);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  return (
+    <div>
+      <AdminPageNavbar />
+
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-4">Users Overview</h1>
+
+        {/* Landlords Section */}
+        <h2 className="text-xl font-semibold mb-2">View All Landlords</h2>
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b text-left">ID</th>
+              <th className="py-2 px-4 border-b text-left">Name</th>
+              <th className="py-2 px-4 border-b text-left">Property Name</th>
+              <th className="py-2 px-4 border-b text-left">Address</th>
+              <th className="py-2 px-4 border-b text-left">Email</th>
+              <th className="py-2 px-4 border-b text-left">Total Tenants</th>
+            </tr>
+          </thead>
+          <tbody>
+            {landlords.map((landlord, index) => (
+              <tr key={landlord._id}>
+                <td className="py-2 px-4 border-b text-left">{landlord._id}</td>
+                <td className="py-2 px-4 border-b text-left">{landlord.name}</td>
+                <td className="py-2 px-4 border-b text-left">{landlord.propertyName}</td>
+                <td className="py-2 px-4 border-b text-left">{landlord.address}</td>
+                <td className="py-2 px-4 border-b text-left">{landlord.email}</td>
+                <td className="py-2 px-4 border-b text-left">{landlord.totalTenants}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Tenants Section */}
+        <h2 className="text-xl font-semibold mt-8 mb-2">View All Tenants</h2>
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b text-left">ID</th>
+              <th className="py-2 px-4 border-b text-left">Name</th>
+              <th className="py-2 px-4 border-b text-left">Address</th>
+              <th className="py-2 px-4 border-b text-left">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tenants.map((tenant, index) => (
+              <tr key={tenant._id}>
+                <td className="py-2 px-4 border-b text-left">{tenant._id}</td>
+                <td className="py-2 px-4 border-b text-left">{tenant.name}</td>
+                <td className="py-2 px-4 border-b text-left">{tenant.address}</td>
+                <td className="py-2 px-4 border-b text-left">{tenant.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;

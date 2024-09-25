@@ -4,19 +4,18 @@ const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-    trim: true,
+
   },
   lastName: {
     type: String,
     required: true,
-    trim: true,
+
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true,
-    trim: true,
+
   },
   password: {
     type: String,
@@ -28,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   accountType: {
     type: String,
-    enum: ['tenant', 'landlord', 'admin'],
+    enum: ['tenant', 'landlord'],
     required: true,
   },
   landlordDetails: {
@@ -41,16 +40,39 @@ const userSchema = new mongoose.Schema({
       required: function() { return this.accountType === 'landlord'; }
     },
     attachment: {
-      type: String, // Assuming a URL or file path
-      required: function() { return this.accountType === 'landlord'; }
+      publicId: {
+        type: String,
+        required: false,
+      },
+      url: {
+        type: String,
+        required: false,
+      }
     },
     additionalInfo: {
       type: String,
       required: function() { return this.accountType === 'landlord'; }
     },
+  },
+  profilePicture: {
+    publicId: {
+      type: String,
+      required: false,
+    },
+    url: {
+      type: String,
+      required: false,
+    }
+  },
+  address: {
+      type: String,
+      required: false,
+  },
+  accessToken: {
+    type: String,
+    required: false,
   }
 }, { timestamps: true });
 
-// Export the user model
 const User = mongoose.model('User', userSchema);
 export default User;

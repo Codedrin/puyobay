@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 
-dotenv.config(); 
+dotenv.config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,7 +11,10 @@ cloudinary.config({
 
 const uploadToCloudinary = async (path, folder = 'PuyobayAssets') => {
   try {
-    const result = await cloudinary.uploader.upload(path, { folder: folder });
+    const result = await cloudinary.uploader.upload(path, {
+      folder: folder,
+      resource_type: 'auto', // Allows all file types
+    });
     return {
       url: result.secure_url,
       publicId: result.public_id,
@@ -23,4 +26,3 @@ const uploadToCloudinary = async (path, folder = 'PuyobayAssets') => {
 };
 
 export { cloudinary, uploadToCloudinary };
-
