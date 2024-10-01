@@ -79,23 +79,20 @@ export const registerUser = async (req, res) => {
 };
 
 
-
 //Signin
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, accountType } = req.body; // Get accountType from request
 
     // Check if the login attempt is for an admin
     if (email === process.env.ADMIN_EMAIL) {
       if (password === process.env.ADMIN_PASSWORD) {
-        // Generate a token for the admin
         const token = jwt.sign(
-          { id: 'admin' }, // Admin doesn't have a userId, so we can use 'admin' or any identifier
+          { id: 'admin' },
           process.env.JWT_SECRET,
           { expiresIn: '1h' }
         );
-
         return res.status(200).json({ token, redirectURL: '/admin-page' });
       } else {
         return res.status(401).json({ message: 'Invalid credentials' });
@@ -116,6 +113,11 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Check if the provided accountType matches the user's account type
+    if (user.accountType !== accountType) {
+      return res.status(403).json({ message: `This account is registered as a ${user.accountType}. Please log in with the correct account type.` });
+    }
+
     // Check if the account type is landlord and if the account is approved
     if (user.accountType === 'landlord' && !user.approved) {
       return res.status(403).json({ message: 'Your account has not been approved. Please contact the admin.' });
@@ -123,7 +125,7 @@ export const loginUser = async (req, res) => {
 
     // Generate a new token after successful login
     const token = jwt.sign(
-      { id: user._id },  // Include the userId in the token payload
+      { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -143,7 +145,6 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: 'Error logging in', error: error.message });
   }
 };
-
 
 
 //forgotPassword

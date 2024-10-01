@@ -2,7 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; 
 import '../index.css';
 
-
+//AuthGuard
+import PropertyAuth from './PageAuth/PropertyAuth.jsx';
+import ProtectedRoute from './PageAuth/ProtectedRoute.jsx';
+import AdminAuth from './PageAuth/AdminAuth.jsx';
 //Users Account
 import Signin from './views/pages/Signin.jsx';
 import Signup from './views/pages/Signup.jsx';
@@ -13,6 +16,10 @@ import AdminLogin from './views/pages/admin/AdminLogin.jsx';
 import Admin from './views/pages/admin/Admin.jsx';
 import ManageUser from './views/pages/admin/ManageUser.jsx';
 import Settings from './views/pages/admin/Settings.jsx';
+
+//Landlord
+import LandlordPage from './views/pages/landlord/LandlordPage.jsx';
+import LandlordViewProfile from './views/pages/landlord/LandlordViewProfile.jsx';
 //Tenant
 import TenantPage from './views/pages/tenant/TenantPage.jsx';
 import Properties from './views/pages/tenant/Properties.jsx';
@@ -24,15 +31,25 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         {/* AdminLoginPage */}
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin-page" element={<Admin />} />
-        <Route path="/admin/manage-users" element={<ManageUser />} />
-        <Route path="/admin/settings" element={<Settings />} />
-      
+        <Route path="/admin" element={ <AdminLogin />} />
+        <Route path="/admin-page" element={<AdminAuth> <Admin /> </AdminAuth>} />
+        <Route path="/admin/manage-users" element={<AdminAuth><ManageUser /> </AdminAuth>} />
+        <Route path="/admin/settings" element={<AdminAuth> <Settings /> </AdminAuth>} />
+      {/* Landlord Page */}
+      <Route path="/landlord" element={<ProtectedRoute> <LandlordPage /> </ProtectedRoute>} />
+      <Route path="/landlord-profile" element={<ProtectedRoute> <LandlordViewProfile /> </ProtectedRoute>} />
         {/* Tenant Page */}
-        <Route path="/tenant" element={<TenantPage />} />
-        <Route path="/properties" element={<Properties />} />
+        <Route path="/tenant" element={<ProtectedRoute> <TenantPage /> </ProtectedRoute>} />
+        <Route
+          path="/properties"
+          element={
+            <PropertyAuth>
+              <Properties />
+            </PropertyAuth>
+          } />
+
         </Routes>
+        
     </Router>
   );
 }

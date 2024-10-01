@@ -28,50 +28,44 @@ const Login = () => {
   
     try {
       setLoading(true);
-
-      // Validate account type before proceeding
+  
       if (!accountType) {
         toast.error("Please select an account type.");
         setLoading(false);
         return;
       }
   
-      // Login request without requiring an existing token
-      const response = await axios.post(
-        'http://localhost:5000/api/users/login',
-        { email, password, accountType }
-      );
+      // Send login request with email, password, and accountType
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email,
+        password,
+        accountType,
+      });
   
-      // Handle remember me functionality
+      // Handle "Remember Me" functionality
       if (rememberMe) {
         localStorage.setItem('rememberMe', email);
-        localStorage.setItem('userPassword', btoa(password)); // Base64 encode the password
+        localStorage.setItem('userPassword', btoa(password)); // Base64 encode password
       } else {
         localStorage.removeItem('rememberMe');
         localStorage.removeItem('userPassword');
       }
   
-      // Store the user and token in localStorage
+      // Store user and token in localStorage
       const { accessToken, redirectURL } = response.data;
       localStorage.setItem('user', JSON.stringify({
         accessToken: accessToken,
         email,
         accountType,
-        id: response.data.id // Assuming the response contains the user ID
+        id: response.data.id,
       }));
   
-      // Redirect to the appropriate page
+      // Redirect to appropriate page
       window.location.href = redirectURL;
     } catch (error) {
       setLoading(false);
       if (error.response && error.response.data.message) {
-        if (error.response.data.message === 'Your account has not been approved. Please contact the admin.') {
-          // Show toast for unapproved landlord
-          toast.error('Your account is not approved. Please contact the admin.');
-        } else {
-          // General login error
-          toast.error(error.response.data.message || 'Login failed');
-        }
+        toast.error(error.response.data.message || 'Login failed');
       } else {
         toast.error('An unexpected error occurred. Please try again.');
       }
@@ -79,6 +73,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+  
   
   return (
     <div>
