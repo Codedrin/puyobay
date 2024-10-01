@@ -6,7 +6,7 @@ const TenantHeader = () => {
   const navigate = useNavigate();
 
   const handleBookNowClick = () => {
-    navigate('/property');
+    navigate('/properties');
   };
 
   return (

@@ -4,6 +4,8 @@ import { bg } from '../../assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify'; // Import Toast
+import 'react-toastify/dist/ReactToastify.css'; // Import Toast CSS
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +31,7 @@ const Login = () => {
 
       // Validate account type before proceeding
       if (!accountType) {
-        alert("Please select an account type.");
+        toast.error("Please select an account type.");
         setLoading(false);
         return;
       }
@@ -61,7 +63,18 @@ const Login = () => {
       // Redirect to the appropriate page
       window.location.href = redirectURL;
     } catch (error) {
-      console.error('Login error:', error);
+      setLoading(false);
+      if (error.response && error.response.data.message) {
+        if (error.response.data.message === 'Your account has not been approved. Please contact the admin.') {
+          // Show toast for unapproved landlord
+          toast.error('Your account is not approved. Please contact the admin.');
+        } else {
+          // General login error
+          toast.error(error.response.data.message || 'Login failed');
+        }
+      } else {
+        toast.error('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -161,6 +174,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <ToastContainer /> {/* Include the ToastContainer to show toasts */}
     </div>
   );
 };

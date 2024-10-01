@@ -4,18 +4,15 @@ const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-
   },
   lastName: {
     type: String,
     required: true,
-
   },
   email: {
     type: String,
     required: true,
     unique: true,
-
   },
   password: {
     type: String,
@@ -65,12 +62,18 @@ const userSchema = new mongoose.Schema({
     }
   },
   address: {
-      type: String,
-      required: false,
+    type: String,
+    required: false,
   },
   accessToken: {
     type: String,
     required: false,
+  },
+  approved: {
+    type: Boolean,
+    default: function() {
+      return this.accountType === 'tenant'; // Automatically approved for tenants, not for landlords
+    }
   }
 }, { timestamps: true });
 

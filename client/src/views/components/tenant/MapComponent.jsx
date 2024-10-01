@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
 
-import { siaa } from '../../../assets'; // Ensure the image path is correct
-
+// Map center coordinates
 const center = [9.8486, 126.0458];
 
 // List of boarding houses with coordinates and names
@@ -24,30 +21,72 @@ const boardingHouses = [
   { name: 'Liacel Boarding House', lat: 9.872556322711675, lng: 125.97022238025855 },
 ];
 
-// Create a custom marker using Font Awesome icon
+// Create a custom marker using Font Awesome icon with red color
 const houseIcon = new L.DivIcon({
   html: `<div style="font-size: 20px; color: #B8001F;"><i class="fas fa-home"></i></div>`,
-  className: 'custom-icon', // Optional, add a class if you want to style it with CSS
+  className: 'custom-icon',
   iconSize: [25, 25],
-  iconAnchor: [12, 12], // Adjust to properly align the icon
-  popupAnchor: [0, -10], // Adjust the position of the popup
+  iconAnchor: [12, 12],
+  popupAnchor: [0, -10],
 });
 
-const Map = () => {
+// Helper component to update map center
+const RecenterMap = ({ center, zoomLevel = 18 }) => {
+    const map = useMap();
+    map.setView(center, zoomLevel);
+    return null;
+  };
+  
+
+const MapComponent = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedBoardingHouse, setSelectedBoardingHouse] = useState(null);
+  const [mapCenter, setMapCenter] = useState(center);
+
+  // Search function for the boarding houses
+  const handleSearch = () => {
+    const foundHouse = boardingHouses.find(house => 
+      house.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    if (foundHouse) {
+      setMapCenter([foundHouse.lat, foundHouse.lng]);
+      setSelectedBoardingHouse(foundHouse);
+    } else {
+      alert("Boarding house not found");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center">
+      {/* Search Input */}
+      <div className="my-4">
+        <input 
+          type="text" 
+          className="border px-3 py-2 rounded" 
+          placeholder="Search for a boarding house..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button 
+          onClick={handleSearch} 
+          className="bg-blue-500 text-white px-4 py-2 rounded ml-2">
+          Search
+        </button>
+      </div>
+
       {/* Map Heading */}
-      <h2 className="text-3xl font-bold my-4">Explore Our Locations</h2>
+      <h2 className="text-3xl font-bold my-4 text-blue-500">Explore Our Locations</h2>
 
       {/* Map Container */}
       <div className="w-full max-w-4xl mx-auto shadow-md rounded-lg overflow-hidden">
         <MapContainer
-          center={center}
-          zoom={12}
+          center={mapCenter}
+          zoom={15}
           style={{ height: '400px', width: '100%' }}
         >
+          {/* Recenter map when a house is searched */}
+          <RecenterMap center={mapCenter} />
+
           {/* TileLayer for rendering the map */}
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -59,10 +98,11 @@ const Map = () => {
             <Marker
               key={index}
               position={[house.lat, house.lng]}
-              icon={houseIcon} // Use the custom house icon
+              icon={houseIcon}
               eventHandlers={{
                 click: () => {
                   setSelectedBoardingHouse(house);
+                  setMapCenter([house.lat, house.lng]); // Recenter on click
                 },
               }}
             >
@@ -79,32 +119,8 @@ const Map = () => {
           ))}
         </MapContainer>
       </div>
-
-      {/* Two-Column Layout for Description and Image */}
-      <div className="w-full max-w-4xl mt-8 p-4 flex flex-col md:flex-row items-center">
-        {/* Text Column */}
-        <div className="md:w-1/2 p-4">
-          <p className="text-gray-700">
-            Siargao Island, located in the Philippines, is renowned for its pristine beaches,
-            crystal-clear waters, and lush landscapes. Often referred to as the "Surfing Capital
-            of the Philippines," Siargao offers a perfect blend of natural beauty and vibrant local
-            culture. The island is a popular destination for surfing enthusiasts, adventure seekers,
-            and those looking to experience the laid-back island lifestyle. With its numerous
-            attractions, including the famous Cloud 9 surf break and stunning island-hopping
-            opportunities, Siargao promises an unforgettable experience for every visitor.
-          </p>
-        </div>
-        {/* Image Column */}
-        <div className="md:w-2/3 p-4">
-          <img
-            src={siaa}
-            alt="Siargao Island"
-            className="w-full h-auto rounded-md shadow-md"
-          />
-        </div>
-      </div>
     </div>
   );
 };
 
-export default Map;
+export default MapComponent;
