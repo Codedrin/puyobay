@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LandlordNavbar from '../../../constants/LandlordNavbar';
+import BookingAndProperty from '../../components/landlord/BookingAndProperty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,25 +14,25 @@ const LandlordViewProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
   const user = JSON.parse(localStorage.getItem('user'));
-  const userEmail = user?.email; 
+  const userId = user?.id;
+
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/users/profile/${userEmail}`);
-        setProfile(data); 
+        const { data } = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
+        setProfile(data);
       } catch (error) {
         console.error('Error fetching profile:', error);
         toast.error('Error fetching profile data');
       }
     };
 
-    if (userEmail) {
+    if (userId) {
       fetchProfile();
     }
-  }, [userEmail]);
+  }, [userId]);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -46,61 +47,73 @@ const LandlordViewProfile = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-const uploadFileToCloudinary = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', 'your_upload_preset');
-  formData.append('cloud_name', 'your_cloud_name');
+  const uploadFileToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'PuyobayAssets'); 
+    formData.append('cloud_name', 'ddmgrfhwk');
 
-  try {
-    const response = await axios.post(
-      'https://api.cloudinary.com/v1_1/your_cloud_name/upload',
-      formData
-    );
-    return {
-      url: response.data.secure_url,  // The Cloudinary URL
-      publicId: response.data.public_id  // The public ID
-    };
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    throw error;
-  }
-};
-
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/ddmgrfhwk/upload',
+        formData
+      );
+      return {
+        url: response.data.secure_url, 
+        publicId: response.data.public_id 
+      };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
+  
     if (newPassword && newPassword !== confirmPassword) {
       toast.error("Passwords don't match");
       setLoading(false);
       return;
     }
-
+  
     try {
+      // Check if a new profile picture is uploaded
       let uploadedUrl = profile.profilePicture?.url;
       if (selectedFile) {
-        uploadedUrl = await uploadFileToCloudinary(selectedFile); 
+        uploadedUrl = await uploadFileToCloudinary(selectedFile);
       }
-
+  
+      // Build the updated profile object
       const updatedProfile = {
-        ...profile,
-        profilePicture: uploadedUrl,
-        ...(newPassword && { password: newPassword }), 
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
+        phoneNumber: profile.phoneNumber,
+        address: profile.address,
+        ...(newPassword && { password: newPassword }), // Add password only if provided
       };
-
-      await axios.put(`http://localhost:5000/api/users/profile/update/${userEmail}`, updatedProfile);
-
+  
+      // Only add profilePicture if a new one has been uploaded
+      if (selectedFile) {
+        updatedProfile.profilePicture = uploadedUrl;
+      }
+  
+      // Send the updated profile data to the server
+      await axios.put(`http://localhost:5000/api/users/profile/update/${userId}`, updatedProfile);
+  
       toast.success('Profile updated successfully');
-      toggleModal(); 
+      toggleModal();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error updating profile');
     } finally {
-        setLoading(false);
-      }
-    };
-
+      setLoading(false);
+    }
+  };
+  
+  
   return (
     <div>
       <LandlordNavbar />
@@ -219,7 +232,7 @@ const uploadFileToCloudinary = async (file) => {
                   name="email"
                   className="w-full px-3 py-2 border rounded-lg bg-gray-100"
                   value={profile.email}
-                  disabled 
+                  onChange={handleChange} 
                 />
               </div>
               <div className="mb-4">
@@ -287,6 +300,10 @@ const uploadFileToCloudinary = async (file) => {
           </div>
         </div>
       )}
+      
+      {/* Add the BookingAndProperty component below the profile */}
+      <BookingAndProperty />
+
     </div>
   );
 };

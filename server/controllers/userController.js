@@ -140,12 +140,19 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Account type not recognized' });
     }
 
-    return res.status(200).json({ token, redirectURL });
+
+    // Updated response to include user id
+    return res.status(200).json({ 
+      token, 
+      redirectURL, 
+      id: user._id,  // Include the user id here
+      email: user.email,  // You can also include this for consistency
+      accountType: user.accountType
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error: error.message });
   }
 };
-
 
 //forgotPassword
 

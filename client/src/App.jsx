@@ -32,7 +32,7 @@ const App = () => {
         <Route path="/forgot" element={<ForgotPassword />} />
         {/* AdminLoginPage */}
         <Route path="/admin" element={ <AdminLogin />} />
-        <Route path="/admin-page" element={<AdminAuth> <Admin /> </AdminAuth>} />
+        <Route path="/admin-page" element= {<Admin />} />
         <Route path="/admin/manage-users" element={<AdminAuth><ManageUser /> </AdminAuth>} />
         <Route path="/admin/settings" element={<AdminAuth> <Settings /> </AdminAuth>} />
       {/* Landlord Page */}
