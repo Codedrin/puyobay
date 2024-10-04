@@ -77,22 +77,24 @@ export const getPropertiesByUser = async (req, res) => {
     }
   };
   
-  // Update Property
-  export const updateProperty = async (req, res) => {
-    const { id } = req.params;
-    const userId = req.user._id;
-  
-    try {
-      const updatedData = req.body;
-      const updatedProperty = await Property.findOneAndUpdate({ _id: id, userId }, updatedData, { new: true });
-      if (!updatedProperty) {
-        return res.status(404).json({ message: 'Property not found or you are not authorized to update' });
-      }
-      res.status(200).json(updatedProperty);
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating property', error });
+// Update Property
+export const updateProperty = async (req, res) => {
+  const { id } = req.params; // Property ID passed as a parameter
+
+  try {
+    const updatedData = req.body; // The updated property data from the client
+    const updatedProperty = await Property.findByIdAndUpdate(id, updatedData, { new: true });
+
+    if (!updatedProperty) {
+      return res.status(404).json({ message: 'Property not found' });
     }
-  };
+
+    res.status(200).json(updatedProperty); // Return the updated property
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating property', error });
+  }
+};
+
   
       // Delete Property
 

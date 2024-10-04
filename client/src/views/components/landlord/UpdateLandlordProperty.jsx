@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import LandlordNavbar from '../../../constants/LandlordNavbar';
 
 const UpdateLandlordProperty = () => {
-  // State to manage the form data
+  const { id } = useParams(); // Get property ID from URL params
+  const navigate = useNavigate(); // For navigation after update
+  const [isLoading, setIsLoading] = useState(false); // Loading state for spinner
+  const [imageFile, setImageFile] = useState(null); // State for image file
+  const [imagePreview, setImagePreview] = useState(null); // State for image preview
   const [propertyData, setPropertyData] = useState({
     propertyName: '',
     selectArea: '',
@@ -12,6 +20,7 @@ const UpdateLandlordProperty = () => {
     roomArea: '',
     price: '',
     details: '',
+    images: [], // Array of images, initially empty
   });
 
   // Handle form field changes
@@ -20,11 +29,64 @@ const UpdateLandlordProperty = () => {
     setPropertyData({ ...propertyData, [id]: value });
   };
 
+  // Handle file selection and image preview
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file)); // Show image preview
+  };
+
+  // Upload image to Cloudinary
+  const uploadFileToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'PuyobayAssets');
+    formData.append('cloud_name', 'ddmgrfhwk');
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/ddmgrfhwk/upload',
+        formData
+      );
+      return {
+        url: response.data.secure_url,
+        publicId: response.data.public_id
+      };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  };
+
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can handle the form submission, like calling an API
-    console.log('Form Data:', propertyData);
+    setIsLoading(true); // Show loading spinner
+
+    try {
+      let imageData = {};
+      // If a new image is selected, upload it
+      if (imageFile) {
+        imageData = await uploadFileToCloudinary(imageFile);
+      }
+
+      // Prepare data to send to the server (images array)
+      const updatedData = {
+        ...propertyData,
+        ...(imageData.url && { images: [{ url: imageData.url, publicId: imageData.publicId }] }), // Include image array if available
+      };
+
+      // Send update request
+      const response = await axios.put(`http://localhost:5000/api/users/update-property/${id}`, updatedData);
+      console.log('Property updated:', response.data);
+      setIsLoading(false); // Hide loading spinner
+      alert('Property updated successfully!');
+      navigate('/manage-properties'); // Redirect after successful update
+    } catch (error) {
+      console.error('Error updating property:', error);
+      setIsLoading(false); // Hide loading spinner
+      alert('Failed to update property. Please try again.');
+    }
   };
 
   return (
@@ -40,13 +102,17 @@ const UpdateLandlordProperty = () => {
           {/* Left Side - Image Upload Section */}
           <div className="flex flex-col items-center">
             <div className="bg-gray-200 w-80 h-60 flex items-center justify-center mb-4">
-              <span className="text-gray-600 text-lg">500 x 300</span>
+              {/* Image preview if selected */}
+              {imagePreview ? (
+                <img src={imagePreview} alt="Selected" className="object-cover w-full h-full" />
+              ) : (
+                <span className="text-gray-600 text-lg">500 x 300</span>
+              )}
             </div>
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="picture">
               Update Picture
             </label>
-            <input type="file" id="picture" className="mb-4 p-2 border border-gray-300 rounded-lg" />
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">Update Picture</button>
+            <input type="file" id="picture" onChange={handleFileChange} className="mb-4 p-2 border border-gray-300 rounded-lg" />
           </div>
 
           {/* Right Side - Form Section */}
@@ -62,6 +128,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.propertyName}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
@@ -75,6 +142,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.selectArea}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 >
                   <option value="">Select Area</option>
                   <option value="Dapa">Dapa</option>
@@ -94,6 +162,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.address}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
@@ -107,6 +176,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.type}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 >
                   <option value="House">House</option>
                   <option value="Apartment">Apartment</option>
@@ -123,6 +193,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.rooms}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
@@ -136,6 +207,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.roomArea}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
@@ -149,6 +221,7 @@ const UpdateLandlordProperty = () => {
                   value={propertyData.price}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
@@ -162,11 +235,16 @@ const UpdateLandlordProperty = () => {
                   onChange={handleChange}
                   rows="4"
                   className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
                 />
               </div>
 
               <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                Update
+                {isLoading ? (
+                  <FontAwesomeIcon icon={faSpinner} spin /> // Show spinner when loading
+                ) : (
+                  'Update'
+                )}
               </button>
             </form>
           </div>
