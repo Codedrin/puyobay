@@ -27,12 +27,12 @@ const propertySchema = new mongoose.Schema({
       required: true,
     },
     
-    // Enum to limit SelectArea to specific values
     selectArea: {
       type: String,
       required: false,
-      enum: ['Dapa', 'General Luna', 'Pilar', 'Del Carmen'], // Only these values are allowed
+      enum: ['San Isidro', 'Del Carmen'], // Only San Isidro and Del Carmen are allowed
     },
+    
     
     roomArea: {
       type: Number,
@@ -63,6 +63,14 @@ const propertySchema = new mongoose.Schema({
         },
       },
     ],
+    
+    rating: {
+      type: Number,
+      required: false,
+      min: 1,
+      max: 5, 
+    },
+
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

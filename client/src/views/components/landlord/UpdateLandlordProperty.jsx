@@ -145,9 +145,7 @@ const UpdateLandlordProperty = () => {
                   required
                 >
                   <option value="">Select Area</option>
-                  <option value="Dapa">Dapa</option>
-                  <option value="General Luna">General Luna</option>
-                  <option value="Pilar">Pilar</option>
+                  <option value="San Isidro">San Isidro</option>
                   <option value="Del Carmen">Del Carmen</option>
                 </select>
               </div>
