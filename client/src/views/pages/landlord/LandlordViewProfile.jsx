@@ -17,6 +17,11 @@ const LandlordViewProfile = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
 
+  //Booking front-end 
+  const bookings = {
+    pending: 3,
+    confirmed: 5,
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -183,6 +188,17 @@ const LandlordViewProfile = () => {
           </table>
         </div>
       )}
+      
+            {/* Bookings Section */}
+            <div className="container mx-auto p-4">
+        <h2 className="text-2xl font-semibold mb-4">Bookings</h2>
+        <p className="mb-2">Last updated: September 5, 2024</p>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          View Bookings ({bookings.pending} pending, {bookings.confirmed} confirmed)
+        </button>
+      </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
