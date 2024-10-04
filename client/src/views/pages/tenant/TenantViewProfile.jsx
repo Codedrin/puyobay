@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import TenantNavbar from '../../constants/TenantNabar';
-
+import React, { useState, useEffect } from 'react';
+import TenantNavbar from '../../../constants/TenantNabar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 const TenantViewProfile = () => {
+  const [profile, setProfile] = useState({});
   const [expandedIndex, setExpandedIndex] = useState(null); // Manage which reservation is expanded
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Static profile data
-  const profile = {
-    firstName: 'Jennie',
-    lastName: 'Kim',
-    email: 'jennie@gmail.com',
-    phoneNumber: '(123) 456-7890',
-    address: 'Dapa, Siargao Island',
-    profilePicture: 'https://example.com/jennie-profile.jpg', // Replace with actual image URL
-  };
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user?.id;
+
+
 
   // Static reservations data
   const reservations = [
@@ -35,6 +35,86 @@ const TenantViewProfile = () => {
     },
   ];
 
+
+  useEffect(() => {
+    // Fetch profile data
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, [userId]);
+
+  // Function to handle modal open/close
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  const uploadFileToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'PuyobayAssets'); 
+    formData.append('cloud_name', 'ddmgrfhwk');
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/ddmgrfhwk/upload',
+        formData
+      );
+      return {
+        url: response.data.secure_url, 
+        publicId: response.data.public_id 
+      };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  };
+
+  // Function to handle form submission for updating profile
+  const handleUpdateProfile = async (event) => {
+    event.preventDefault();
+      setLoading(true)
+
+    let profilePictureData = profile.profilePicture;
+
+    // If the user selected a new profile picture, upload it to Cloudinary
+    if (profileImage) {
+      try {
+        profilePictureData = await uploadFileToCloudinary(profileImage);
+      } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        alert('Failed to upload profile picture');
+        setLoading(false);
+        return;
+      }
+    }
+
+    try {
+      const updatedProfile = {
+        ...profile,
+        profilePicture: profilePictureData // Update the profile picture with the new one (if uploaded)
+      };
+
+      const response = await axios.put(`http://localhost:5000/api/users/profile/update/${userId}`, updatedProfile);
+      setProfile(response.data.user); // Update the state with the updated profile
+      toggleModal(); // Close the modal
+      alert('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
   // Function to handle click and toggle the visibility of reservation details
   const toggleReservation = (index) => {
     if (expandedIndex === index) {
@@ -44,10 +124,7 @@ const TenantViewProfile = () => {
     }
   };
 
-  // Function to handle modal open/close
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+
 
   return (
     <div>
@@ -59,11 +136,14 @@ const TenantViewProfile = () => {
           <div className="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-4 sm:space-y-0">
             {/* Profile Image */}
             <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-blue-700">
-              <img
-                src={profile.profilePicture}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+            <img
+                    src={
+                    profile.profilePicture?.url ||
+                    'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'
+                    }
+                    alt="Landlord Profile"
+                    className="w-full h-full object-cover"
+                />
             </div>
 
             {/* Profile Information */}
@@ -90,30 +170,21 @@ const TenantViewProfile = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
-            <form>
+            <form onSubmit={handleUpdateProfile}>
               <div className="mb-4">
                 <label className="block text-gray-700">Profile Picture</label>
-                <input type="file" className="w-full px-3 py-2 border rounded-lg" />
+                <input
+                  type="file"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  onChange={(e) => setProfileImage(e.target.files[0])} // Set the selected profile image
+                />
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700">Email Address</label>
                 <input
                   type="email"
-                  defaultValue={profile.email}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">New Password</label>
-                <input
-                  type="password"
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Confirm Password</label>
-                <input
-                  type="password"
+                  value={profile.email || ''}
+                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -121,7 +192,8 @@ const TenantViewProfile = () => {
                 <label className="block text-gray-700">Phone Number</label>
                 <input
                   type="text"
-                  defaultValue={profile.phoneNumber}
+                  value={profile.phoneNumber || ''}
+                  onChange={(e) => setProfile({ ...profile, phoneNumber: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -129,7 +201,8 @@ const TenantViewProfile = () => {
                 <label className="block text-gray-700">Address</label>
                 <input
                   type="text"
-                  defaultValue={profile.address}
+                  value={profile.address || ''}
+                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -144,14 +217,20 @@ const TenantViewProfile = () => {
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  disabled={loading}
                 >
-                  Save Changes
+                  {loading ? (
+                    <FontAwesomeIcon icon={faSpinner} spin />
+                  ) : (
+                    'Save Changes'
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
 
       {/* Reservations Section */}
       <div className="container mx-auto p-4">

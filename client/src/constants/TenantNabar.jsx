@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { logo } from '../assets';
+import axios from 'axios';
 
 const TenantNavbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null); // Store the profile data
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user?.id;
 
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear the user from localStorage
     navigate('/'); // Redirect to the login page
   };
+
+  useEffect(() => {
+    // Fetch profile data
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, [userId]);
+  
+  const profileImageUrl = profile?.profilePicture?.url || 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; // Default image if no profile picture
 
   return (
     <nav className="bg-gradient-to-r from-blue-500 to-blue-400 p-4">
@@ -48,9 +66,10 @@ const TenantNavbar = () => {
 
           {/* User Icon with Dropdown */}
           <div className="relative">
-            <FontAwesomeIcon
-              icon={faUser}
-              className="text-white text-2xl cursor-pointer"
+          <img
+              src={profileImageUrl} // Profile picture URL
+              alt="Profile"
+              className="h-10 w-10 rounded-full cursor-pointer"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             />
             {dropdownOpen && (

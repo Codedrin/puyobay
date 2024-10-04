@@ -25,25 +25,14 @@ const TenantFooterProperty = () => {
         <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Different Municipalities</h2>
 
         {/* Municipalities Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Dapa */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <img src={h3} alt="Dapa" className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h3 className="text-xl font-bold text-blue-600">Dapa</h3>
-              <div className="flex items-center">
-                {renderStars(4)} {/* 4-star rating */}
-              </div>
-              <p className="mt-2">Vibrant life with modern amenities and local charm.</p>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">View</button>
-            </div>
-          </div>
+        <div className="flex flex-col md:flex-row justify-center md:space-x-20 space-y-6 md:space-y-0">
+
 
           {/* General Luna */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white shadow-md rounded-lg w-full md:w-96 overflow-hidden">
             <img src={h2} alt="General Luna" className="w-full h-40 object-cover" />
             <div className="p-4">
-              <h3 className="text-xl font-bold text-blue-600">General Luna</h3>
+              <h3 className="text-xl font-bold text-blue-600">San Isidro</h3>
               <div className="flex items-center">
                 {renderStars(5)} {/* 5-star rating */}
               </div>
@@ -52,21 +41,8 @@ const TenantFooterProperty = () => {
             </div>
           </div>
 
-          {/* Pilar */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <img src={h31} alt="Pilar" className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h3 className="text-xl font-bold text-blue-600">Pilar</h3>
-              <div className="flex items-center">
-                {renderStars(3)} {/* 3-star rating */}
-              </div>
-              <p className="mt-2">Known for its serene atmosphere and local markets.</p>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">View</button>
-            </div>
-          </div>
-
           {/* Del Carmen */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="bg-white shadow-md rounded-lg w-full md:w-96 overflow-hidden">
             <img src={twoRoom} alt="Del Carmen" className="w-full h-40 object-cover" />
             <div className="p-4">
               <h3 className="text-xl font-bold text-blue-600">Del Carmen</h3>

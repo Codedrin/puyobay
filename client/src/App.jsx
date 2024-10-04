@@ -25,7 +25,7 @@ import UpdateLandlordProperty from './views/components/landlord/UpdateLandlordPr
 //Tenant
 import TenantPage from './views/pages/tenant/TenantPage.jsx';
 import Properties from './views/pages/tenant/Properties.jsx';
-import TenantViewProfile from './views/pages/TenantViewProfile.jsx';
+import TenantViewProfile from './views/pages/tenant/TenantViewProfile.jsx';
 const App = () => {
   return (
     <Router>
