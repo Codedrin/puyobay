@@ -87,7 +87,7 @@ const BookingAndProperty = () => {
       };
   
       // Make a POST request to your backend to save the property
-      await axios.post(`http://localhost:5000/api/users/add-property/${userId}`, propertyData);
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/add-property/${userId}`, propertyData);
   
       toast.success('Property added successfully');
       setProperty({

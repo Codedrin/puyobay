@@ -9,7 +9,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users'); // Adjust URL if needed
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`); // Adjust URL if needed
         setLandlords(response.data.landlords);
         setTenants(response.data.tenants);
       } catch (error) {
