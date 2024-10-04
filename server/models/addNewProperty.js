@@ -26,6 +26,31 @@ const propertySchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
+    
+    // Enum to limit SelectArea to specific values
+    selectArea: {
+      type: String,
+      required: false,
+      enum: ['Dapa', 'General Luna', 'Pilar', 'Del Carmen'], // Only these values are allowed
+    },
+    
+    roomArea: {
+      type: Number,
+      required: false,
+    },
+    
+    // Enum to limit Type to either 'House' or 'Apartment'
+    type: {
+      type: String,
+      required: false,
+      enum: ['House', 'Apartment'], // Only 'House' and 'Apartment' allowed
+    },
+
+    price: {
+      type: Number,
+      required: false,
+    },
+
     images: [
       {
         publicId: {
@@ -43,11 +68,10 @@ const propertySchema = new mongoose.Schema({
       ref: 'User',
       required: true,
     },
-  }, {
+}, {
     timestamps: true, // Adds createdAt and updatedAt fields
-  });
-  
-  const Property = mongoose.model('Property', propertySchema);
-  
-  export default Property;
-  
+});
+
+const Property = mongoose.model('Property', propertySchema);
+
+export default Property;

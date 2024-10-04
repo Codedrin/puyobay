@@ -15,12 +15,11 @@ router.delete('/deny/:landlordId', denyLandlord);
 router.put('/approve/:landlordId', toggleApprovalStatus);
 
 //Landlord
-//Landlord routes
 router.get('/profile/:id', getUserProfileById);  
 router.put('/profile/update/:id', updateUserProfile);  
-router.post('/add-property/:id',  addProperty); // Add new property (Protected Route)
-router.get('/landlord-property',  getPropertiesByUser); // Get all properties by user
-router.get('/property/:id',  getPropertyById); // Get single property by ID
-router.put('/update-property/:id',  updateProperty); // Update property (Protected Route)
-router.delete('/delete-property/:id',  deleteProperty); // Delete property (Protected Route)
+router.post('/add-property/:id',  addProperty); 
+router.get('/landlord-property/:id',  getPropertiesByUser); 
+router.get('/property/:id',  getPropertyById);
+router.put('/update-property/:id',  updateProperty); 
+router.delete('/delete-property/:id',  deleteProperty);
 export default router;

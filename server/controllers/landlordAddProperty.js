@@ -41,9 +41,14 @@ export const addProperty = async (req, res) => {
   
   
   
-  // Get Properties by User ID
-  export const getPropertiesByUser = async (req, res) => {
-    const userId = req.user._id;
+
+// Get Properties by User ID
+export const getPropertiesByUser = async (req, res) => {
+    const userId = req.query.userId; // Fetch userId from query parameters
+  
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
   
     try {
       const properties = await Property.find({ userId });
@@ -52,6 +57,10 @@ export const addProperty = async (req, res) => {
       res.status(500).json({ message: 'Error fetching properties', error });
     }
   };
+  
+
+
+
   
   // Get Single Property by ID
   export const getPropertyById = async (req, res) => {
@@ -85,18 +94,21 @@ export const addProperty = async (req, res) => {
     }
   };
   
-  // Delete Property
-  export const deleteProperty = async (req, res) => {
-    const { id } = req.params;
-    const userId = req.user._id;
-  
-    try {
-      const deletedProperty = await Property.findOneAndDelete({ _id: id, userId });
-      if (!deletedProperty) {
-        return res.status(404).json({ message: 'Property not found or you are not authorized to delete' });
-      }
-      res.status(200).json({ message: 'Property deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error deleting property', error });
-    }
-  };
+      // Delete Property
+
+      export const deleteProperty = async (req, res) => {
+        const { id } = req.params;
+
+        try {
+          // Delete the property based on its ID
+          const deletedProperty = await Property.findByIdAndDelete(id);
+
+          if (!deletedProperty) {
+            return res.status(404).json({ message: 'Property not found' });
+          }
+
+          res.status(200).json({ message: 'Property deleted successfully' });
+        } catch (error) {
+          res.status(500).json({ message: 'Error deleting property', error });
+        }
+      };
