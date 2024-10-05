@@ -26,7 +26,7 @@ const LandlordViewProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/${userId}`);
+        const { data } = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/profile/${userId}`);
         setProfile(data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -106,7 +106,7 @@ const LandlordViewProfile = () => {
       }
   
       // Send the updated profile data to the server
-      await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/update/${userId}`, updatedProfile);
+      await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/profile/update/${userId}`, updatedProfile);
   
       toast.success('Profile updated successfully');
       toggleModal();
