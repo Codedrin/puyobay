@@ -40,7 +40,7 @@ const TenantViewProfile = () => {
     // Fetch profile data
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/profile/${userId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/${userId}`);
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -101,7 +101,7 @@ const TenantViewProfile = () => {
         profilePicture: profilePictureData // Update the profile picture with the new one (if uploaded)
       };
 
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/profile/update/${userId}`, updatedProfile);
+      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/update/${userId}`, updatedProfile);
       setProfile(response.data.user); // Update the state with the updated profile
       toggleModal(); // Close the modal
       alert('Profile updated successfully');

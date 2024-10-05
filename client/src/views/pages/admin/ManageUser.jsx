@@ -11,7 +11,7 @@ const ManageUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
         const { landlords, tenants } = response.data;
         setLandlords(landlords);  // Set the landlords with updated approved status
         setTenants(tenants);      // Set tenants if needed
@@ -30,7 +30,7 @@ const ManageUser = () => {
   const handleToggleApproval = async (landlordId, currentStatus) => {
     try {
       // Send a PUT request to toggle the approval status in the backend
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/approve/${landlordId}`, { approved: !currentStatus });
+      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/approve/${landlordId}`, { approved: !currentStatus });
     
       const updatedLandlord = response.data.landlord;
     
@@ -51,7 +51,7 @@ const ManageUser = () => {
 
   const handleDeny = async (landlordId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/deny/${landlordId}`);
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/deny/${landlordId}`);
       toast.success('Landlord denied and removed successfully');
       setLandlords(landlords.filter(landlord => landlord._id !== landlordId)); // Remove from local state
 

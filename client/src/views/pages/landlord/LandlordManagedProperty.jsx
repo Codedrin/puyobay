@@ -52,7 +52,7 @@ const LandlordManagedProperty = () => {
   const handleDelete = async (propertyId) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
-        await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/delete-property/${propertyId}`);
+        await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/delete-property/${propertyId}`);
         toast.success("Property deleted successfully!");
         setProperties(properties.filter(property => property._id !== propertyId)); // Remove from UI
       } catch (error) {
