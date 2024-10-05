@@ -3,17 +3,13 @@ import dotenv from 'dotenv';
 import dbcon from './config/dbcon.js'; // Adjusted relative path
 import cors from 'cors';
 import userRoutes from './routes/userRoutes.js'; 
-const corsConfig = {
-  origin: '*',
-  credential: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
-};
+
 const app = express();
 
 dotenv.config();
 dbcon();
 
-app.use(cors(corsConfig));
+app.use(cors());
 app.use(express.json());
 
 // Use user routes
