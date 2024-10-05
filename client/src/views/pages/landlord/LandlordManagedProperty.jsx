@@ -19,7 +19,7 @@ const LandlordManagedProperty = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/landlord-property/${userId}`, {
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/landlord-property/${userId}`, {
           params: { userId }
         });
         setProperties(response.data);
