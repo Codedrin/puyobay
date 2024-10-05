@@ -36,12 +36,20 @@ const Login = () => {
       }
   
       // Send login request with email, password, and accountType
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`, {
-        email,
-        password,
-        accountType,
-      });
-  
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`, 
+        {
+          email,
+          password,
+          accountType
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+
       // Handle "Remember Me" functionality
       if (rememberMe) {
         localStorage.setItem('rememberMe', email);
