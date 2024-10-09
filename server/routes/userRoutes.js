@@ -6,6 +6,7 @@ import { addProperty, getPropertiesByUser, getPropertyById, updateProperty, dele
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
 import { getAllProperties } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
+import { processBooking } from '../controllers/processBooking.js';
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
@@ -33,4 +34,5 @@ router.get('/get-properties', getAllProperties);
 router.get('/get-propertiesId/:id', getBookPropertyById);
 router.post('/submitrating/:id/rate', submitRating);
 router.get('/get-average-ratings', getAverageRatings);
+router.post('/process-booking', upload.single('receipt'), processBooking);
 export default router;

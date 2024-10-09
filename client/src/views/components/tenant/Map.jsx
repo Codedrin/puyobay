@@ -47,13 +47,13 @@ const MapComponent = () => {
   const [properties, setProperties] = useState([]);
   const navigate = useNavigate(); // Hook to navigate between routes
 
-  // Fetch properties from an API
+  // Fetch properties with average ratings from the API
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/users/get-properties'); // Replace with actual API
+        const response = await fetch('http://localhost:5000/api/users/get-average-ratings'); 
         const data = await response.json();
-        setProperties(data); // Assuming `data` contains the properties with _id and propertyName
+        setProperties(data);
       } catch (error) {
         console.error('Error fetching properties:', error);
       }
@@ -62,9 +62,23 @@ const MapComponent = () => {
     fetchProperties();
   }, []);
 
+
   // Handle Book Now navigation
   const handleBookNow = (propertyId) => {
     navigate(`/book-property/${propertyId}`); // Navigate using the property ID
+  };
+
+  // Function to render star rating
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <span key={i} className={i < rating ? 'text-yellow-500' : 'text-gray-300'}>
+          ★
+        </span>
+      );
+    }
+    return stars;
   };
 
   return (
@@ -94,12 +108,24 @@ const MapComponent = () => {
                   position={[coordinates.lat, coordinates.lng]} // Use lat/lng values from boardingHousesCoordinates
                   icon={houseIcon}
                 >
-                  <Popup>
+                 <Popup>
                     <div>
                       <h2>{property.propertyName}</h2>
+                      <img
+                        src={property.images[0]?.url}
+                        alt={property.propertyName}
+                        className="w-full h-24 object-cover mb-2"
+                      />
+                      <p>{property.description}</p>
+                      <p><strong>Price:</strong> ₱{property.price}</p>
+                      <p><strong>Rooms Available:</strong> {property.availableRooms}</p>
+                      <p><strong>Area:</strong> {property.area} sq ft</p>
+                      <div className="flex mb-2">
+                        {renderStars(property.averageRating || 0)}
+                      </div>
                       <button
                         className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
-                        onClick={() => handleBookNow(property._id)} // Navigate on button click
+                        onClick={() => handleBookNow(property._id)}
                       >
                         Book Now
                       </button>
