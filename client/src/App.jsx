@@ -26,6 +26,8 @@ import UpdateLandlordProperty from './views/components/landlord/UpdateLandlordPr
 import TenantPage from './views/pages/tenant/TenantPage.jsx';
 import Properties from './views/pages/tenant/Properties.jsx';
 import TenantViewProfile from './views/pages/tenant/TenantViewProfile.jsx';
+import BookProperty from './views/pages/tenant/BookProperty.jsx';
+import BookingForm from './views/components/tenant/BookingForm.jsx';
 const App = () => {
   return (
     <Router>
@@ -62,6 +64,27 @@ const App = () => {
               <TenantViewProfile />
             </PropertyAuth>
           } />
+            <Route
+              path="/book-property/:propertyId" 
+              element={
+                <PropertyAuth>
+                  <BookProperty />
+                </PropertyAuth>
+              }
+            />
+                        <Route
+              path="/book-house/:propertyId" 
+              element={
+                <PropertyAuth>
+                  <BookingForm />
+                </PropertyAuth>
+              }
+            />
+
+
+
+
+
         </Routes>
         
     </Router>

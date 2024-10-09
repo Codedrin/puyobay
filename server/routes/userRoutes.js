@@ -4,6 +4,8 @@ import { registerUser, loginUser, forgotPassword, getUsersByType, toggleApproval
 import { getUserProfileById, updateUserProfile } from '../controllers/LandlordProfileController.js';
 import { addProperty, getPropertiesByUser, getPropertyById, updateProperty, deleteProperty } from '../controllers/landlordAddProperty.js';
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
+import { getAllProperties } from '../controllers/getAllproperties.js';
+import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
@@ -27,5 +29,8 @@ router.delete('/delete-property/:id',  deleteProperty);
 //Tenanat 
 router.get('/profile/:id', getUserProfile);
 router.put('/profile/update/:id', updateTenantUserProfile);
-
+router.get('/get-properties', getAllProperties);
+router.get('/get-propertiesId/:id', getBookPropertyById);
+router.post('/submitrating/:id/rate', submitRating);
+router.get('/get-average-ratings', getAverageRatings);
 export default router;
