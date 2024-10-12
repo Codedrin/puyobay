@@ -307,7 +307,7 @@ const TenantViewProfile = () => {
                       <p><strong>Check-out:</strong> {formatDate(booking.checkOutDate)}</p>
                       <p><strong>Number of Guests:</strong> {booking.persons}</p>
                       <p><strong>Total Price:</strong> ₱{booking.price}</p>
-                      <p><strong>Status:</strong> {booking.status}</p>
+                      <p><strong>Payment Status:</strong> {booking.paymentStatus}</p>
                       <button
                         className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
                         onClick={() => handleCancelBooking(booking._id)}

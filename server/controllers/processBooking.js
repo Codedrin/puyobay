@@ -65,7 +65,8 @@ export const processBooking = async (req, res) => {
         mobileNumberUsed: paymentMethod === 'GCash' ? paymentDetails.mobileNumberUsed : null,
         senderName: paymentMethod === 'GCash' ? paymentDetails.senderName : null,
         receipt: paymentMethod === 'GCash' ? receipt : {}
-      }
+      },
+      status: false
     };
 
     // Check if the property already has bookings
@@ -153,8 +154,9 @@ export const getBookingsByUserId = async (req, res) => {
     const userBookings = bookedProperties.flatMap(property =>
       property.bookings.filter(booking => booking.user.toString() === userId).map(booking => ({
         ...booking.toObject(),
-        propertyName: property.property.propertyName, // Adding property name
-        price: property.property.price // Adding property price
+        propertyName: property.property.propertyName, 
+        price: property.property.price,
+        paymentStatus: booking.status ? 'Paid' : 'Not Paid'
       }))
     );
 
