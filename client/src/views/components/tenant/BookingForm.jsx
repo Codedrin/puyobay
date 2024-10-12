@@ -114,7 +114,7 @@ const BookingForm = () => {
             const response = await axios.post('http://localhost:5000/api/users/process-booking', bookingData);
 
             if (response.status === 201) {
-                toast.success('Booking processed successfully');
+                toast.success('Booking processed successfully Pleased Wait for the confirmation Email.');
             } else {
                 toast.error('Failed to process booking');
             }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TenantNavbar from '../../../constants/TenantNabar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
 const TenantViewProfile = () => {
   const [profile, setProfile] = useState({});
@@ -9,6 +10,8 @@ const TenantViewProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [bookingLoading, setBookingLoading] = useState(true); 
 
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
@@ -49,6 +52,57 @@ const TenantViewProfile = () => {
 
     fetchProfile();
   }, [userId]);
+
+  useEffect(() => {
+    // Fetch bookings data
+    const fetchBookings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/bookings/${userId}`);
+        setBookings(response.data.bookings);
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+      } finally {
+        setBookingLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [userId]);
+
+    // Function to format the date to "October 11, 2024"
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    };
+
+    
+    // Function to handle click and toggle the visibility of reservation details
+    const toggleReservation = (index) => {
+      if (expandedIndex === index) {
+        setExpandedIndex(null); // Collapse if clicked again
+      } else {
+        setExpandedIndex(index); // Expand if not already expanded
+      }
+    };
+
+  // Function to handle cancellation of a booking
+  const handleCancelBooking = async (bookingId) => {
+    const confirmCancel = window.confirm('Are you sure you want to cancel this booking?');
+    if (!confirmCancel) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/users/delete-booking/${userId}/${bookingId}`);
+      setBookings(bookings.filter((booking) => booking._id !== bookingId));
+      toast.success('Booking cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      toast.error('Failed to cancel booking');
+    }
+  };
 
   // Function to handle modal open/close
   const toggleModal = () => {
@@ -114,15 +168,6 @@ const TenantViewProfile = () => {
   };
 
 
-
-  // Function to handle click and toggle the visibility of reservation details
-  const toggleReservation = (index) => {
-    if (expandedIndex === index) {
-      setExpandedIndex(null); // Collapse if clicked again
-    } else {
-      setExpandedIndex(index); // Expand if not already expanded
-    }
-  };
 
 
 
@@ -232,42 +277,51 @@ const TenantViewProfile = () => {
       )}
 
 
+  
       {/* Reservations Section */}
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4 text-blue-700">Previous Reservations</h2>
-        <div className="space-y-4">
-          {reservations.map((reservation, index) => (
-            <div key={index} className="bg-white rounded-lg border">
-              <button
-                className={`w-full text-left bg-white text-blue-700 px-4 py-2 flex justify-between items-center transition-all duration-300 ease-in-out ${expandedIndex === index ? 'border border-blue-500' : ''}`}
-                onClick={() => toggleReservation(index)}
-              >
-                <span className="font-semibold text-lg">{reservation.propertyName}</span>
-                <span>{expandedIndex === index ? '⌄' : '⌃'}</span>
-              </button>
+        {bookingLoading ? (
+          <p>Loading bookings...</p>
+        ) : bookings.length === 0 ? (
+          <p>No bookings found.</p>
+        ) : (
+          <div className="space-y-4">
+            {bookings.map((booking, index) => (
+              <div key={index} className="bg-white rounded-lg border">
+                <button
+                  className={`w-full text-left bg-white text-blue-700 px-4 py-2 flex justify-between items-center transition-all duration-300 ease-in-out ${expandedIndex === index ? 'border border-blue-500' : ''}`}
+                  onClick={() => toggleReservation(index)}
+                >
+                 <span className="font-semibold text-lg">{booking.propertyName}</span>
+                  <span>{expandedIndex === index ? '⌄' : '⌃'}</span>
+                </button>
 
-              {/* Conditionally render the details with smooth transition */}
-              <div
-                className={`transition-max-height duration-500 ease-in-out overflow-hidden ${expandedIndex === index ? 'max-h-96' : 'max-h-0'}`}
-              >
-                {expandedIndex === index && (
-                  <div className="px-4 py-4 border border-blue-500">
-                    <p><strong>Check-in:</strong> {reservation.checkIn}</p>
-                    <p><strong>Check-out:</strong> {reservation.checkOut}</p>
-                    <p><strong>Number of Guests:</strong> {reservation.numberOfGuests}</p>
-                    <p><strong>Total Price:</strong> ₱{reservation.totalPrice}</p>
-                    <p><strong>Status:</strong> {reservation.status}</p>
-                    <button className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                      Cancel Booking
-                    </button>
-                  </div>
-                )}
+                {/* Conditionally render the details with smooth transition */}
+                <div
+                  className={`transition-max-height duration-500 ease-in-out overflow-hidden ${expandedIndex === index ? 'max-h-96' : 'max-h-0'}`}
+                >
+                  {expandedIndex === index && (
+                    <div className="px-4 py-4 border border-blue-500">
+                      <p><strong>Check-in:</strong> {formatDate(booking.checkInDate)}</p>
+                      <p><strong>Check-out:</strong> {formatDate(booking.checkOutDate)}</p>
+                      <p><strong>Number of Guests:</strong> {booking.persons}</p>
+                      <p><strong>Total Price:</strong> ₱{booking.price}</p>
+                      <p><strong>Status:</strong> {booking.status}</p>
+                      <button
+                        className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        onClick={() => handleCancelBooking(booking._id)}
+                      >
+                        Cancel Booking
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-
       {/* Upcoming Houses Section */}
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4">Upcoming New Houses</h2>
@@ -279,6 +333,7 @@ const TenantViewProfile = () => {
         <h2 className="text-2xl font-semibold mb-4">Favorite Properties</h2>
         <p>View and manage your favorite properties here.</p>
       </div>
+      <ToastContainer />
     </div>
   );
 };
