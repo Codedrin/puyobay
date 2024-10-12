@@ -2,6 +2,7 @@ import User from '../models/userModel.js';
 import Property from '../models/addNewProperty.js';
 import BookedProperty from '../models/bookedProperty.js';
 import sendEmail from '../utils/sendEmail.js';
+
 // Controller to get bookings for landlord's properties
 export const getBookingsByLandlord = async (req, res) => {
     const { landlordId } = req.params; // We get the landlordId from the URL params
@@ -54,8 +55,9 @@ export const getBookingsByLandlord = async (req, res) => {
   
 
 
-// Controller to update booking status and notify tenant
-export const updateBookingStatus = async (req, res) => {
+
+//Update the booking status
+  export const updateBookingStatus = async (req, res) => {
     const { bookingId } = req.params; // Get the booking ID from params
     const { status, tenantEmail, tenantName } = req.body; // Status, tenant email, and name from request body
   
@@ -69,16 +71,33 @@ export const updateBookingStatus = async (req, res) => {
       // Update the booking status as a boolean
       const bookingIndex = booking.bookings.findIndex((b) => b._id.toString() === bookingId);
       if (bookingIndex > -1) {
-     
-        
         const isConfirmed = status === 'Confirmed';
-        booking.bookings[bookingIndex].status = isConfirmed;    
+        booking.bookings[bookingIndex].status = isConfirmed;
         await booking.save();
   
         // Prepare the email message
-        const message = isConfirmed
+        let message = isConfirmed
           ? `Dear ${tenantName},\n\nYour booking has been confirmed. We look forward to welcoming you.\n\nBest regards,`
           : `Dear ${tenantName},\n\nWe regret to inform you that your booking has been rejected. Please contact the administrator for further details.\n\nBest regards,`;
+  
+        // Include payment details if the booking is confirmed
+        if (isConfirmed) {
+          const paymentMethod = booking.bookings[bookingIndex].paymentMethod;
+          const paymentDetails = booking.bookings[bookingIndex].paymentDetails;
+  
+          message += `\n\nPayment Information:\nPayment Method: ${paymentMethod}\n`;
+  
+          // Add specific payment details based on the payment method
+          if (paymentMethod === 'GCash') {
+            message += `Reference Number: ${paymentDetails.referenceNumber}\n`;
+            message += `Mobile Number Used: ${paymentDetails.mobileNumberUsed}\n`;
+            message += `Sender Name: ${paymentDetails.senderName}\n`;
+          }
+  
+          // Include booking status (Paid/Not Paid)
+          const isPaid = booking.bookings[bookingIndex].status ? 'Paid' : 'Not Paid';
+          message += `\nBooking Status: ${isPaid}\n`;
+        }
   
         // Call the sendEmail function
         await sendEmail({
@@ -96,4 +115,6 @@ export const updateBookingStatus = async (req, res) => {
       res.status(500).json({ message: 'Server error', error });
     }
   };
+  
+
   
