@@ -9,3 +9,5 @@ export const getAllProperties = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch properties' });
   }
 };
+
+//Get PropertyName and the UserId 
