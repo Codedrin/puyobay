@@ -7,7 +7,7 @@ import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantPr
 import { getAllProperties } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
 import { processBooking, deleteBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
-import { getBookingsByLandlord, updateBookingStatus } from '../controllers/LandlordViewBooking.js';
+import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
 const router = express.Router();
 
@@ -28,6 +28,7 @@ router.get('/landlord-property/:id',  getPropertiesByUser);
 router.get('/property/:id',  getPropertyById);
 router.put('/update-property/:id',  updateProperty); 
 router.get('/bookings/landlord/:landlordId', getBookingsByLandlord);
+router.get('/landlord-dashboard/:landlordId', getLandlordDashboardData);
 router.put('/bookings/status/:bookingId', updateBookingStatus);
 router.delete('/delete-property/:id',  deleteProperty);
 

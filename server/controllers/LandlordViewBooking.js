@@ -54,8 +54,6 @@ export const getBookingsByLandlord = async (req, res) => {
   };
   
 
-
-
 //Update the booking status
   export const updateBookingStatus = async (req, res) => {
     const { bookingId } = req.params; // Get the booking ID from params
@@ -117,4 +115,66 @@ export const getBookingsByLandlord = async (req, res) => {
   };
   
 
-  
+// getLandlordDashboardData
+export const getLandlordDashboardData = async (req, res) => {
+  const { landlordId } = req.params; 
+
+  try {
+      const landlord = await User.findById(landlordId);
+      if (!landlord || landlord.accountType !== 'landlord') {
+          return res.status(404).json({ message: 'Landlord not found' });
+      }
+
+      const properties = await Property.find({ userId: landlordId });
+      if (properties.length === 0) {
+          return res.status(404).json({ message: 'No properties found for this landlord' });
+      }
+
+      const propertyIds = properties.map((property) => property._id);
+      const bookedProperties = await BookedProperty.find({
+          property: { $in: propertyIds },
+      })
+      .populate('property', 'propertyName') 
+      .populate('bookings.user', 'firstName lastName email address phoneNumber'); 
+
+      if (!bookedProperties || bookedProperties.length === 0) {
+          return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
+      }
+
+      // Preparing tenants data
+      const tenants = bookedProperties.flatMap((bookedProperty) =>
+          bookedProperty.bookings.map((booking) => ({
+              userId: booking.user._id, 
+              name: `${booking.user.firstName} ${booking.user.lastName}`,
+              address: booking.user.address,
+              phoneNumber: booking.user.phoneNumber,
+              email: booking.user.email,
+              bookingDate: booking.checkInDate,
+              status: booking.status ? 'Paid' : 'Pending',
+          }))
+      );
+
+      // Aggregate check-ins and check-outs info
+      const checkInOut = {
+          checkIns: tenants.filter(t => new Date(t.bookingDate) <= new Date()).length, 
+          checkOuts: tenants.filter(t => new Date(t.bookingDate) > new Date()).length, 
+      };
+
+      // Aggregate payment information
+      const payments = {
+          paid: tenants.filter(t => t.status === 'Paid').length,
+          pending: tenants.filter(t => t.status === 'Pending').length,
+      };
+
+      res.status(200).json({
+          tenants,
+          checkInOut,
+          payments,
+      });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
+

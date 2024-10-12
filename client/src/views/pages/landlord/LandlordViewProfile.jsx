@@ -15,16 +15,14 @@ const LandlordViewProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [confirmedCount, setConfirmedCount] = useState(0); 
+
+
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
 
   const navigate = useNavigate();
-
-  //Booking front-end 
-  const bookings = {
-    pending: 3,
-    confirmed: 5,
-  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,6 +39,31 @@ const LandlordViewProfile = () => {
       fetchProfile();
     }
   }, [userId]);
+
+  // Fetch the actual bookings data for pending/confirmed counts
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/users/bookings/landlord/${userId}`);
+        const bookings = response.data.bookings;
+        
+        // Calculate the counts dynamically
+        const pending = bookings.filter(booking => booking.status === false).length;
+        const confirmed = bookings.filter(booking => booking.status === true).length;
+
+        setPendingCount(pending);
+        setConfirmedCount(confirmed);
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        toast.error('Error fetching bookings data');
+      }
+    };
+
+    if (userId) {
+      fetchBookings();
+    }
+  }, [userId]);
+
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -197,15 +220,15 @@ const LandlordViewProfile = () => {
         </div>
       )}
       
-            {/* Bookings Section */}
-            <div className="container mx-auto p-4">
+       {/* Bookings Section */}
+      <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4">Bookings</h2>
         <p className="mb-2">Last updated: September 5, 2024</p>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={() => handleViewBookings(user.id)}
         >
-          View Bookings ({bookings.pending} pending, {bookings.confirmed} confirmed)
+          View Bookings ({pendingCount} pending, {confirmedCount} confirmed)
         </button>
       </div>
 
