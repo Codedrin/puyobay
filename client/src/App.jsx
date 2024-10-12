@@ -22,6 +22,7 @@ import LandlordPage from './views/pages/landlord/LandlordPage.jsx';
 import LandlordViewProfile from './views/pages/landlord/LandlordViewProfile.jsx';
 import LandlordManagedProperty from './views/pages/landlord/LandlordManagedProperty.jsx';
 import UpdateLandlordProperty from './views/components/landlord/UpdateLandlordProperty.jsx';
+import LandlordViewBooking from './views/pages/landlord/LandlordViewBooking.jsx';
 //Tenant
 import TenantPage from './views/pages/tenant/TenantPage.jsx';
 import Properties from './views/pages/tenant/Properties.jsx';
@@ -50,6 +51,9 @@ const App = () => {
       <Route path="/landlord-profile" element={<ProtectedRoute> <LandlordViewProfile /> </ProtectedRoute>} />
       <Route path="/manage-properties" element={<ProtectedRoute> <LandlordManagedProperty /> </ProtectedRoute>} />
       <Route path="/update-properties/:id" element={<ProtectedRoute><UpdateLandlordProperty /></ProtectedRoute>} />
+      <Route path="/view-bookings/:userId" element={<ProtectedRoute><LandlordViewBooking /></ProtectedRoute>} />
+
+
 
 
         {/* Tenant Page */}

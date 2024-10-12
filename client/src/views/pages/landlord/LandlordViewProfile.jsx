@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';  
 
 const LandlordViewProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,8 @@ const LandlordViewProfile = () => {
   const [loading, setLoading] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
+
+  const navigate = useNavigate();
 
   //Booking front-end 
   const bookings = {
@@ -118,7 +121,12 @@ const LandlordViewProfile = () => {
     }
   };
   
-  
+
+    const handleViewBookings = (userId) => {
+      navigate(`/view-bookings/${userId}`);
+    };
+
+
   return (
     <div>
       <LandlordNavbar />
@@ -195,6 +203,7 @@ const LandlordViewProfile = () => {
         <p className="mb-2">Last updated: September 5, 2024</p>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => handleViewBookings(user.id)}
         >
           View Bookings ({bookings.pending} pending, {bookings.confirmed} confirmed)
         </button>
