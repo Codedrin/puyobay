@@ -41,6 +41,8 @@ export const getBookingsByLandlord = async (req, res) => {
           status: booking.status,
           userId: booking.user._id,
           tenantEmail: booking.user.email,
+          paymentMethod: booking.paymentMethod,
+          paymentDetails: booking.paymentDetails,
         }))
       );
   

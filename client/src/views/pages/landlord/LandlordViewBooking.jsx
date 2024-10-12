@@ -3,11 +3,14 @@ import axios from 'axios';
 import LandlordNavbar from '../../../constants/LandlordNavbar';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import ShowPaymentModal from '../../components/landlord/ShowPaymentModal';
 const LandlordViewBooking = () => {
   const [pendingBookings, setPendingBookings] = useState([]);
   const [confirmedBookings, setConfirmedBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState(null); 
+  const [isShowPaymentModal, setIsShowPaymentModal] = useState (false);
+
 
   // Get the landlordId from local storage
   const user = JSON.parse(localStorage.getItem('user'));
@@ -50,6 +53,17 @@ const LandlordViewBooking = () => {
     }
   };
   
+  const handlePayment = (bookingId) => {
+    const booking = [...pendingBookings, ...confirmedBookings].find(b => b.bookingId === bookingId);
+    if (booking){
+      setSelectedBooking(booking); 
+      setIsShowPaymentModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsShowPaymentModal(false); // Close the modal
+  };
 
   if (loading) {
     return <div>Loading bookings...</div>;
@@ -72,6 +86,7 @@ const LandlordViewBooking = () => {
                   <th className="border p-2">Tenant Name</th>
                   <th className="border p-2">Booking Date</th>
                   <th className="border p-2">Status</th>
+                  <th className="border p-2">Payment</th>
                   <th className="border p-2">Actions</th>
                 </tr>
               </thead>
@@ -83,7 +98,16 @@ const LandlordViewBooking = () => {
                     <td className="border p-2">{booking.tenantName}</td>
                     <td className="border p-2">{new Date(booking.bookingDate).toLocaleDateString()}</td>
                     <td className="border p-2">{booking.status ? 'Paid' : 'Not Paid'}</td>
-                    <td className="border p-2">
+                    <td className="border p-2 text-center">
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                        onClick={() => handlePayment(booking.bookingId)}
+                      >
+                        Payment
+                      </button>
+                    </td>
+
+                    <td className="border p-2 text-center">
                       <button
                         className="bg-green-500 text-white px-2 py-1 rounded mr-2"
                         onClick={() => handleUpdateStatus(booking.bookingId, 'Confirmed', booking.tenantEmail, booking.tenantName)}
@@ -97,6 +121,7 @@ const LandlordViewBooking = () => {
                         Reject
                       </button>
                     </td>
+                    
                   </tr>
                 ))}
               </tbody>
@@ -137,6 +162,16 @@ const LandlordViewBooking = () => {
           )}
         </div>
       </div>
+
+        {/* Payment Modal */}
+        {selectedBooking && (
+        <ShowPaymentModal
+          isOpen={isShowPaymentModal}
+          onClose={closeModal}
+          paymentMethod={selectedBooking.paymentMethod}
+          paymentDetails={selectedBooking.paymentDetails}
+        />
+      )}
     </div>
   );
 };
