@@ -1,13 +1,14 @@
-import BookedProperty from "../models/BookedProperty.js";
 import Property from "../models/addNewProperty.js";
 import User from "../models/userModel.js";
+import BookedProperty from "../models/bookedProperty.js";
+
 
 // Controller to process a booking
 export const processBooking = async (req, res) => {
   const { 
     userId,
     propertyId,
-    name,
+    name,   
     age,
     gender,
     phoneNumber,
@@ -15,44 +16,37 @@ export const processBooking = async (req, res) => {
     checkOutDate,
     persons,
     paymentMethod,
-    referenceNumber,
-    mobileNumberUsed,
-    senderName
+    paymentDetails // Payment details, including receipt data, will come from req.body
   } = req.body;
 
-  let receiptFile = req.file;
-
   try {
-    // Log the received data
-    console.log("Request body:", req.body);
-    console.log("Received file:", receiptFile);
-
+    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
-      console.log(`User with ID ${userId} not found`);
       return res.status(404).json({ message: 'User not found' });
     }
-    console.log(`User found: ${user.name}`);
 
+    // Find the property by ID
     const property = await Property.findById(propertyId);
     if (!property) {
-      console.log(`Property with ID ${propertyId} not found`);
       return res.status(404).json({ message: 'Property not found' });
     }
-    console.log(`Property found: ${property.propertyName}`);
 
+    // Initialize receipt object for GCash payments
     let receipt = {
       publicId: '',
       url: ''
     };
 
-    // If payment method is GCash, process the receipt
-    if (paymentMethod === 'GCash' && receiptFile) {
-      receipt.publicId = receiptFile.public_id;
-      receipt.url = receiptFile.path; // Cloudinary sets the URL in req.file.path
-      console.log("Receipt file uploaded to Cloudinary:", receipt);
-    } else {
-      console.log("No receipt file to process");
+    // If payment method is GCash, retrieve receipt information from paymentDetails
+    if (paymentMethod === 'GCash') {
+      if (paymentDetails.receipt) {
+        receipt.publicId = paymentDetails.receipt.publicId;
+        receipt.url = paymentDetails.receipt.url;
+      } else {
+        // Handle the case when the receipt data is missing
+        return res.status(400).json({ message: 'Receipt is required for GCash payments' });
+      }
     }
 
     // Create the booking object
@@ -67,14 +61,12 @@ export const processBooking = async (req, res) => {
       persons,
       paymentMethod,
       paymentDetails: {
-        referenceNumber: paymentMethod === 'GCash' ? referenceNumber : null,
-        mobileNumberUsed: paymentMethod === 'GCash' ? mobileNumberUsed : null,
-        senderName: paymentMethod === 'GCash' ? senderName : null,
+        referenceNumber: paymentMethod === 'GCash' ? paymentDetails.referenceNumber : null,
+        mobileNumberUsed: paymentMethod === 'GCash' ? paymentDetails.mobileNumberUsed : null,
+        senderName: paymentMethod === 'GCash' ? paymentDetails.senderName : null,
         receipt: paymentMethod === 'GCash' ? receipt : {}
       }
     };
-
-    console.log("New booking data:", newBooking);
 
     // Check if the property already has bookings
     let bookedProperty = await BookedProperty.findOne({ property: propertyId });
@@ -85,20 +77,17 @@ export const processBooking = async (req, res) => {
         property: propertyId,
         bookings: [newBooking]
       });
-      console.log("Created new BookedProperty for the property:", bookedProperty);
     } else {
       // If the property already has bookings, add the new booking
       bookedProperty.bookings.push(newBooking);
-      console.log("Added new booking to existing BookedProperty:", bookedProperty);
     }
 
     // Save the booked property
     await bookedProperty.save();
-    console.log("BookedProperty saved successfully.");
 
     res.status(201).json({ message: 'Booking processed successfully', booking: newBooking });
   } catch (error) {
-    console.error('Error processing booking:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+

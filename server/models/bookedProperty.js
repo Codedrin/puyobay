@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema({
     trim: true,
   },
   age: {
-    type: Number,
+    type: String,
     required: true,
   },
   gender: {
@@ -33,7 +33,7 @@ const bookingSchema = new mongoose.Schema({
     required: true,
   },
   persons: {
-    type: Number,
+    type: String,
     required: true,
   },
   paymentMethod: {
