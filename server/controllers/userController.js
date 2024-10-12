@@ -4,11 +4,15 @@ import User from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import { generateAccessToken } from '../utils/jwtUtils.js';
+import sendEmail from '../utils/sendEmail.js';
+import crypto from 'crypto';
+
 dotenv.config();
 
 // Register user controller
 export const registerUser = async (req, res) => {
   try {
+
     const { 
       firstName, 
       lastName, 
@@ -25,11 +29,19 @@ export const registerUser = async (req, res) => {
     // Check if the user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
+      console.log('Email already exists:', email); // Log if the email already exists
       return res.status(400).json({ message: 'Email already exists' });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+
+    // Generate OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiresAt = Date.now() + 30 * 1000; 
+
+
 
     // Create user data object
     const userData = {
@@ -38,6 +50,8 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       phoneNumber,
+      otp, 
+      otpExpiresAt, 
       accountType,
       approved: accountType === 'tenant' // Automatically approve tenants, but not landlords
     };
@@ -53,30 +67,43 @@ export const registerUser = async (req, res) => {
         } : undefined,
         additionalInfo,
       };
+
     }
+
 
     const user = new User(userData);
     const accessToken = generateAccessToken(user._id);
-
     user.accessToken = accessToken;
+
 
     // Save the user to the database
     await user.save();
 
+    // Send the OTP to the user's email
+    const message = `Your OTP for account verification is ${otp}. It will expire in 30 seconds.`;
+    await sendEmail({
+      email: user.email,
+      subject: 'Account Verification - OTP',
+      message,
+    });
+
+    
     res.status(201).json({
-      user: [{
+      user: {
         id: user._id,
         email: user.email,
         accountType: user.accountType,
         accessToken,
-      }]
+      }
     });
 
+
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error('Error registering user:', error); // Log the error if it occurs
     res.status(500).send('Error registering user');
   }
 };
+
 
 
 //Signin

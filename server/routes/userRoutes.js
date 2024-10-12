@@ -7,6 +7,7 @@ import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantPr
 import { getAllProperties } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
 import { processBooking } from '../controllers/processBooking.js';
+import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
@@ -35,4 +36,9 @@ router.get('/get-propertiesId/:id', getBookPropertyById);
 router.post('/submitrating/:id/rate', submitRating);
 router.get('/get-average-ratings', getAverageRatings);
 router.post('/process-booking', upload.single('receipt'), processBooking);
+
+//UserOTP
+router.post('/verify-otp', verifyOtp);
+router.post('/resend-otp/:userId', resendOtp);
+
 export default router;

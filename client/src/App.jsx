@@ -28,6 +28,10 @@ import Properties from './views/pages/tenant/Properties.jsx';
 import TenantViewProfile from './views/pages/tenant/TenantViewProfile.jsx';
 import BookProperty from './views/pages/tenant/BookProperty.jsx';
 import BookingForm from './views/components/tenant/BookingForm.jsx';
+
+//import OTP
+import OTP from './views/pages/OTP.jsx';
+
 const App = () => {
   return (
     <Router>
@@ -49,7 +53,7 @@ const App = () => {
 
 
         {/* Tenant Page */}
-        <Route path="/tenant" element={<ProtectedRoute> <TenantPage /> </ProtectedRoute>} />
+        <Route path="/tenant" element={<ProtectedRoute><TenantPage /></ProtectedRoute>} />
         <Route
           path="/properties"
           element={
@@ -80,6 +84,9 @@ const App = () => {
                 </PropertyAuth>
               }
             />
+
+              {/* OTP */}
+        <Route path="/otp/:userId" element={<OTP />} />
 
 
 
