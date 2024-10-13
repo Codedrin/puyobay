@@ -26,7 +26,7 @@
         // Fetch property details
         const fetchPropertyDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/users/get-propertiesId/${propertyId}`);
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-propertiesId/${propertyId}`);
             const data = await response.json();
             setProperty(data);
         } catch (error) {
@@ -37,7 +37,7 @@
         // Fetch other properties for the carousel
         const fetchOtherProperties = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/users/get-properties');
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-properties`);
             const data = await response.json();
             // Select only 5 properties to display in the carousel
             setOtherProperties(data.slice(0, 5));
@@ -49,7 +49,7 @@
         // Fetch other properties along with their average ratings
         const fetchOtherPropertiesWithRatings = async () => {
             try {
-            const response = await fetch('http://localhost:5000/api/users/get-average-ratings'); // Use the correct endpoint
+            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-average-ratings`); // Use the correct endpoint
             const data = await response.json();
             setOtherProperties(data.slice(0, 5)); // Store properties with ratings
             } catch (error) {
@@ -71,7 +71,7 @@
         }
 
         try {
-        const response = await fetch(`http://localhost:5000/api/users/submitrating/${propertyId}/rate`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/users/submitrating/${propertyId}/rate`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',

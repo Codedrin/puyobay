@@ -44,7 +44,7 @@ const LandlordViewProfile = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/bookings/landlord/${userId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/bookings/landlord/${userId}`);
         const bookings = response.data.bookings;
         
         // Calculate the counts dynamically

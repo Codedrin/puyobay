@@ -57,7 +57,7 @@ const TenantViewProfile = () => {
     // Fetch bookings data
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/bookings/${userId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/bookings/${userId}`);
         setBookings(response.data.bookings);
       } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -95,7 +95,7 @@ const TenantViewProfile = () => {
     if (!confirmCancel) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/users/delete-booking/${userId}/${bookingId}`);
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/delete-booking/${userId}/${bookingId}`);
       setBookings(bookings.filter((booking) => booking._id !== bookingId));
       toast.success('Booking cancelled successfully');
     } catch (error) {

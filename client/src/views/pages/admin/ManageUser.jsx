@@ -11,12 +11,7 @@ const ManageUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-<<<<<<< HEAD
         const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
-=======
-        // Fetch the latest users from the backend
-        const response = await axios.get('http://localhost:5000/api/users');
->>>>>>> master
         const { landlords, tenants } = response.data;
   
         // Update the state with the fetched users
@@ -35,16 +30,9 @@ const ManageUser = () => {
   // When you toggle approval, update the state and save the change to the database
   const handleToggleApproval = async (landlordId, currentStatus) => {
     try {
-<<<<<<< HEAD
       // Send a PUT request to toggle the approval status in the backend
       const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/approve/${landlordId}`, { approved: !currentStatus });
     
-=======
-      // Update the approval status on the backend
-      const response = await axios.put(`http://localhost:5000/api/users/approve/${landlordId}`, { approved: !currentStatus });
-  
-      // Update the state with the new approval status
->>>>>>> master
       const updatedLandlord = response.data.landlord;
   
       // Display a success message

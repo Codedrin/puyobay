@@ -111,7 +111,7 @@ const BookingForm = () => {
                 },
             };
 
-            const response = await axios.post('http://localhost:5000/api/users/process-booking', bookingData);
+            const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/process-booking`, bookingData);
 
             if (response.status === 201) {
                 toast.success('Booking processed successfully Pleased Wait for the confirmation Email.');
