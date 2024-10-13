@@ -73,11 +73,7 @@
     const handleRegularSignUp = async () => {
       try {
         setLoading(true); 
-<<<<<<< HEAD
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
-=======
-        const response = await axios.post('http://localhost:5000/api/users/register', {
->>>>>>> master
           ...formData,
           attachment: null,
         });
@@ -100,11 +96,7 @@
           attachmentUrl = await uploadFileToCloudinary(attachment);
         }
   
-<<<<<<< HEAD
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
-=======
-        const response = await axios.post('http://localhost:5000/api/users/register', {
->>>>>>> master
           ...formData,
           attachment: attachmentUrl,
         });
