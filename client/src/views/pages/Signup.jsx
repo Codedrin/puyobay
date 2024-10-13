@@ -6,7 +6,9 @@
   import LandlordSignupModal from './LandlordSignupModal';
   import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faUser, faEnvelope, faLock, faPhone, faEye, faEyeSlash, faSpinner } from '@fortawesome/free-solid-svg-icons';
-
+  import { toast, ToastContainer } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
+  
   const Signup = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -15,7 +17,7 @@
     const [attachment, setAttachment] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
+  
     const [formData, setFormData] = useState({
       firstName: '',
       lastName: '',
@@ -39,16 +41,28 @@
           'https://api.cloudinary.com/v1_1/ddmgrfhwk/auto/upload',
           formData
         );
-        return response.data.url; // URL of the uploaded file
+        return response.data.url;
       } catch (error) {
         console.error('Error uploading file:', error);
         throw error;
       }
     };
-    
+  
+    // Password validation function
+    const validatePassword = (password) => {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{6,}$/;
+      return passwordRegex.test(password);
+    };
   
     const handleSignUpClicked = (e) => {
       e.preventDefault();
+  
+      if (!validatePassword(formData.password)) {
+        toast.error('Password must be at least 6 characters long and include an uppercase letter, a number, and a symbol.', {
+        });
+        return;
+      }
+  
       if (formData.accountType === 'landlord') {
         setIsModalOpen(true);
       } else {
@@ -59,20 +73,24 @@
     const handleRegularSignUp = async () => {
       try {
         setLoading(true); 
+<<<<<<< HEAD
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
+=======
+        const response = await axios.post('http://localhost:5000/api/users/register', {
+>>>>>>> master
           ...formData,
-          attachment: null, // No attachment for non-landlords
+          attachment: null,
         });
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        // Handle successful registration (e.g., redirect or show a message)
-        navigate('/');
+        
+        const userId = response.data.user.id;
+        navigate(`/otp/${userId}`);
       } catch (error) {
         console.error('Error registering user:', error);
       } finally {
-        setLoading(false); // Set loading to false after the request is complete
+        setLoading(false);
       }
     };
-  
+    
     const handleModalSubmit = async () => {
       try {
         setLoading(true);
@@ -82,13 +100,17 @@
           attachmentUrl = await uploadFileToCloudinary(attachment);
         }
   
+<<<<<<< HEAD
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
+=======
+        const response = await axios.post('http://localhost:5000/api/users/register', {
+>>>>>>> master
           ...formData,
-          attachment: attachmentUrl, // Pass the attachment URL if available
+          attachment: attachmentUrl,
         });
         localStorage.setItem('user', JSON.stringify(response.data.user)); 
-        // Handle successful registration (e.g., redirect or show a message)
-        navigate('/');
+        const userId = response.data.user.id;
+        navigate(`/otp/${userId}`);
         setLoading(false);
         setIsModalOpen(false);
       } catch (error) {
@@ -257,6 +279,7 @@
         onChange={handleChange}
         setAttachment={setAttachment}
       />
+         <ToastContainer /> 
       </div>
     );
   };

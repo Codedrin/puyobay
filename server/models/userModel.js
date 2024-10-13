@@ -22,6 +22,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  otp: {
+    type: String,
+    required: false,
+  },
+  otpExpiresAt: {
+    type: Date,
+    required: false,
+  },
+  otpVerified: {
+    type: Boolean,
+    default: false,
+  },
+  accessToken: {
+    type: String,
+    required: false,
+  },
   accountType: {
     type: String,
     enum: ['tenant', 'landlord'],
@@ -72,7 +88,7 @@ const userSchema = new mongoose.Schema({
   approved: {
     type: Boolean,
     default: function() {
-      return this.accountType === 'tenant'; // Automatically approved for tenants, not for landlords
+      return this.accountType === 'tenant'; 
     }
   }
 }, { timestamps: true });

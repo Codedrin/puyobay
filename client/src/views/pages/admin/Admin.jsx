@@ -9,7 +9,11 @@ const Admin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+<<<<<<< HEAD
         const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`); // Adjust URL if needed
+=======
+        const response = await axios.get('http://localhost:5000/api/users'); 
+>>>>>>> master
         setLandlords(response.data.landlords);
         setTenants(response.data.tenants);
       } catch (error) {
@@ -35,24 +39,28 @@ const Admin = () => {
               <tr>
                 <th className="py-2 px-2 md:px-4 border-b text-left">ID</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left">Name</th>
-                <th className="py-2 px-2 md:px-4 border-b text-left">Property Name</th>
+                <th className="py-2 px-2 md:px-4 border-b text-left">Property Names</th> {/* Updated to Property Names */}
                 <th className="py-2 px-2 md:px-4 border-b text-left">Address</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left">Email</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left">Total Tenants</th>
               </tr>
             </thead>
-            <tbody>
-              {landlords.map((landlord) => (
-                <tr key={landlord._id}>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord._id}</td>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.name}</td>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.propertyName}</td>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.address}</td>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.email}</td>
-                  <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.totalTenants}</td>
-                </tr>
-              ))}
-            </tbody>
+
+                    <tbody>
+          {landlords.map((landlord) => (
+            <tr key={landlord._id}>
+              <td className="py-2 px-2 md:px-4 border-b text-left">{landlord._id}</td>
+              <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.name}</td>
+              <td className="py-2 px-2 md:px-4 border-b text-left">
+                {landlord.propertyNames.join(', ')} 
+              </td>
+              <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.address}</td>
+              <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.email}</td>
+              <td className="py-2 px-2 md:px-4 border-b text-left">{landlord.totalTenants}</td>
+            </tr>
+          ))}
+        </tbody>
+
           </table>
         </div>
 

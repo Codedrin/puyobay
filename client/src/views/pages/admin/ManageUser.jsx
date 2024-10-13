@@ -11,35 +11,51 @@ const ManageUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+<<<<<<< HEAD
         const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
+=======
+        // Fetch the latest users from the backend
+        const response = await axios.get('http://localhost:5000/api/users');
+>>>>>>> master
         const { landlords, tenants } = response.data;
-        setLandlords(landlords);  // Set the landlords with updated approved status
-        setTenants(tenants);      // Set tenants if needed
+  
+        // Update the state with the fetched users
+        setLandlords(landlords);
+        setTenants(tenants);
       } catch (error) {
         console.error('Error fetching users:', error);
         toast.error('Error fetching users');
       }
     };
   
+    // Fetch the latest users when the component loads
     fetchUsers();
-  }, []);
+  }, []); // <-- Ensure fetchUsers runs only when the component loads
   
-  
-  
-
+  // When you toggle approval, update the state and save the change to the database
   const handleToggleApproval = async (landlordId, currentStatus) => {
     try {
+<<<<<<< HEAD
       // Send a PUT request to toggle the approval status in the backend
       const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/approve/${landlordId}`, { approved: !currentStatus });
     
+=======
+      // Update the approval status on the backend
+      const response = await axios.put(`http://localhost:5000/api/users/approve/${landlordId}`, { approved: !currentStatus });
+  
+      // Update the state with the new approval status
+>>>>>>> master
       const updatedLandlord = response.data.landlord;
-    
+  
+      // Display a success message
       toast.success(`Landlord ${currentStatus ? 'disapproved' : 'approved'} successfully`);
-    
+  
       // Update the local state to reflect the change immediately
-      setLandlords(landlords.map((landlord) =>
-        landlord._id === landlordId ? { ...landlord, approved: updatedLandlord.approved } : landlord
-      ));
+      setLandlords((prevLandlords) =>
+        prevLandlords.map((landlord) =>
+          landlord._id === landlordId ? { ...landlord, approved: updatedLandlord.approved } : landlord
+        )
+      );
     } catch (error) {
       console.error('Error toggling landlord approval:', error);
       toast.error(`Error ${currentStatus ? 'disapproving' : 'approving'} landlord`);

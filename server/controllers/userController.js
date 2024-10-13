@@ -4,11 +4,16 @@ import User from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import { generateAccessToken } from '../utils/jwtUtils.js';
+import sendEmail from '../utils/sendEmail.js';
+import crypto from 'crypto';
+import Property from '../models/addNewProperty.js';
+import BookedProperty from '../models/bookedProperty.js';
 dotenv.config();
 
 // Register user controller
 export const registerUser = async (req, res) => {
   try {
+
     const { 
       firstName, 
       lastName, 
@@ -25,11 +30,19 @@ export const registerUser = async (req, res) => {
     // Check if the user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
+      console.log('Email already exists:', email); // Log if the email already exists
       return res.status(400).json({ message: 'Email already exists' });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+
+    // Generate OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiresAt = Date.now() + 30 * 1000; 
+
+
 
     // Create user data object
     const userData = {
@@ -38,6 +51,8 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       phoneNumber,
+      otp, 
+      otpExpiresAt, 
       accountType,
       approved: accountType === 'tenant' // Automatically approve tenants, but not landlords
     };
@@ -53,30 +68,43 @@ export const registerUser = async (req, res) => {
         } : undefined,
         additionalInfo,
       };
+
     }
+
 
     const user = new User(userData);
     const accessToken = generateAccessToken(user._id);
-
     user.accessToken = accessToken;
+
 
     // Save the user to the database
     await user.save();
 
+    // Send the OTP to the user's email
+    const message = `Your OTP for account verification is ${otp}. It will expire in 30 seconds.`;
+    await sendEmail({
+      email: user.email,
+      subject: 'Account Verification - OTP',
+      message,
+    });
+
+    
     res.status(201).json({
-      user: [{
+      user: {
         id: user._id,
         email: user.email,
         accountType: user.accountType,
         accessToken,
-      }]
+      }
     });
 
+
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error('Error registering user:', error); // Log the error if it occurs
     res.status(500).send('Error registering user');
   }
 };
+
 
 
 //Signin
@@ -188,24 +216,70 @@ export const forgotPassword = async (req, res) => {
 // Get all users
 export const getUsersByType = async (req, res) => {
   try {
-    const users = await User.find(); // Fetch all users
+    // Fetch all users
+    const users = await User.find();
 
+    // Fetch all properties and their related landlords
+    const properties = await Property.find().populate('userId', 'firstName lastName');
+
+    // Fetch booked properties (including the property details)
+    const bookedProperties = await BookedProperty.find().populate({
+      path: 'property', // Populate the property details
+      select: 'propertyName', // Select only the property name
+    });
+
+    // Create a mapping of landlordId to their properties
+    const landlordProperties = properties.reduce((acc, property) => {
+      if (property.userId && property.userId._id) { // Add null check for userId
+        if (!acc[property.userId._id]) {
+          acc[property.userId._id] = [];
+        }
+        acc[property.userId._id].push({
+          propertyName: property.propertyName,
+          propertyId: property._id,
+        });
+      }
+      return acc;
+    }, {});
+
+    // Create a mapping of propertyId to total unique tenants (userId)
+    const propertyTenantCount = bookedProperties.reduce((acc, bookedProperty) => {
+      // Use a Set to track unique userIds for each property
+      const uniqueTenantIds = new Set(bookedProperty.bookings.map(booking => booking.user.toString()));
+
+      acc[bookedProperty.property._id] = uniqueTenantIds.size; // Count unique tenants
+      return acc;
+    }, {});
+
+    // Map through landlords and get their property names and tenant counts
     const landlords = users
       .filter(user => user.accountType === 'landlord')
-      .map(landlord => ({
-        _id: landlord._id,
-        name: landlord.firstName + ' ' + landlord.lastName,
-        email: landlord.email,
-        approved: landlord.approved,  // Ensure approved field is returned
-        attachment: landlord.landlordDetails?.attachment || '',
-      }));
+      .map(landlord => {
+        const properties = landlordProperties[landlord._id] || [];
+        const totalTenants = properties.reduce(
+          (sum, property) => sum + (propertyTenantCount[property.propertyId] || 0),
+          0
+        );
 
+        return {
+          _id: landlord._id,
+          name: `${landlord.firstName} ${landlord.lastName}`,
+          email: landlord.email,
+          address: landlord.address,
+          propertyNames: properties.map(prop => prop.propertyName), 
+          totalTenants, 
+          approved: landlord.approved, 
+        };
+      });
+
+    // Map through tenants (no additional logic needed for tenants in this case)
     const tenants = users
       .filter(user => user.accountType === 'tenant')
       .map(tenant => ({
         _id: tenant._id,
-        name: tenant.firstName + ' ' + tenant.lastName,
+        name: `${tenant.firstName} ${tenant.lastName}`,
         email: tenant.email,
+        address: tenant.address,
       }));
 
     res.status(200).json({ landlords, tenants });
@@ -213,6 +287,10 @@ export const getUsersByType = async (req, res) => {
     res.status(500).json({ message: 'Error fetching users', error: error.message });
   }
 };
+
+
+
+
 
 
 // Approve a landlord
@@ -270,8 +348,6 @@ export const toggleApprovalStatus = async (req, res) => {
 
     landlord.approved = approved;
     await landlord.save();
-
-    console.log(`Landlord ${landlord._id} approval status: ${landlord.approved}`);  // Add this for debugging
 
     res.status(200).json({ message: `Landlord ${approved ? 'approved' : 'disapproved'} successfully`, landlord });
   } catch (error) {

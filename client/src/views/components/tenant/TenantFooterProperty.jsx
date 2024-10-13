@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons'; // Import half-star icon
-import { h2, h31, h3, twoRoom } from '../../../assets'; // Update this path as per your project structure
+import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 
 const TenantFooterProperty = () => {
+  const [properties, setProperties] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const propertiesPerPage = 9; // Display 9 properties per page
+  const navigate = useNavigate(); 
+
+  // Fetch properties with average ratings from the API
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/users/get-average-ratings'); // Fetch with average ratings
+        const data = await response.json();
+        setProperties(data);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  // Calculate the properties to display for the current page
+  const indexOfLastProperty = currentPage * propertiesPerPage;
+  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
+  const currentProperties = properties.slice(indexOfFirstProperty, indexOfLastProperty);
+
+  // Render star ratings
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
@@ -18,41 +44,67 @@ const TenantFooterProperty = () => {
     return stars;
   };
 
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(properties.length / propertiesPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleBook = (propertyId) => {
+    navigate(`/book-property/${propertyId}`); // Navigate using useNavigate
+  };
+
   return (
     <div className="py-10">
       <div className="container mx-auto px-4">
         {/* Header */}
         <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Different Municipalities</h2>
 
-        {/* Municipalities Section */}
-        <div className="flex flex-col md:flex-row justify-center md:space-x-20 space-y-6 md:space-y-0">
-
-
-          {/* General Luna */}
-          <div className="bg-white shadow-md rounded-lg w-full md:w-96 overflow-hidden">
-            <img src={h2} alt="General Luna" className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h3 className="text-xl font-bold text-blue-600">San Isidro</h3>
-              <div className="flex items-center">
-                {renderStars(5)} {/* 5-star rating */}
+        {/* Properties Section */}
+        <div className="flex flex-wrap justify-center gap-6">
+          {currentProperties.map((property) => (
+            <div key={property._id} className="bg-white shadow-md rounded-lg w-full md:w-96 overflow-hidden">
+              <img src={property.images[0]?.url} alt={property.propertyName} className="w-full h-40 object-cover" />
+              <div className="p-4">
+                <h3 className="text-xl font-bold text-blue-600">{property.propertyName}</h3>
+                <div className="flex items-center">
+                  {renderStars(property.averageRating || 0)}
+                </div>
+                <p className="mt-2">{property.description}</p>
+                <p><strong>Available Rooms:</strong> {property.availableRooms}</p> 
+                <p><strong>Price:</strong> ₱{property.price}</p> 
+                <p><strong>Area:</strong> {property.area} sq ft</p>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+                 onClick={() => handleBook(property._id)}>
+                   View
+                 </button>
               </div>
-              <p className="mt-2">Popular for its stunning beaches and surfing spots.</p>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">View</button>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Del Carmen */}
-          <div className="bg-white shadow-md rounded-lg w-full md:w-96 overflow-hidden">
-            <img src={twoRoom} alt="Del Carmen" className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h3 className="text-xl font-bold text-blue-600">Del Carmen</h3>
-              <div className="flex items-center">
-                {renderStars(4.5)} {/* 4.5-star rating */}
-              </div>
-              <p className="mt-2">Home to the famous mangrove forest and peaceful surroundings.</p>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">View</button>
-            </div>
-          </div>
+        {/* Pagination Buttons */}
+        <div className="flex justify-center mt-6 space-x-4">
+          <button
+            onClick={handlePreviousPage}
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <button
+            onClick={handleNextPage}
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300"
+            disabled={currentPage === Math.ceil(properties.length / propertiesPerPage)}
+          >
+            Next
+          </button>
         </div>
 
         {/* Footer Section */}

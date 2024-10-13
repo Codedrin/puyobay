@@ -63,12 +63,28 @@ const propertySchema = new mongoose.Schema({
         },
       },
     ],
-    
-    rating: {
+    ratings: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        rating: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 5,
+        },
+      },
+    ],
+    averageRating: {
       type: Number,
-      required: false,
-      min: 1,
-      max: 5, 
+      default: 0,
+    },
+    totalRatings: {
+      type: Number,
+      default: 0,
     },
 
     userId: {
