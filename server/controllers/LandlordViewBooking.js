@@ -3,38 +3,41 @@ import Property from '../models/addNewProperty.js';
 import BookedProperty from '../models/bookedProperty.js';
 import sendEmail from '../utils/sendEmail.js';
 
-// Controller to get bookings for landlord's properties
+
+// Controller to get bookings for landlord's properties// Controller to get bookings for landlord's properties
 export const getBookingsByLandlord = async (req, res) => {
-    const { landlordId } = req.params; // We get the landlordId from the URL params
-  
-    try {
-      // Ensure that the landlord exists
-      const landlord = await User.findById(landlordId);
-      if (!landlord || landlord.accountType !== 'landlord') {
-        return res.status(404).json({ message: 'Landlord not found' });
-      }
-  
-      // Find all properties that belong to the landlord
-      const properties = await Property.find({ userId: landlordId });
-      if (properties.length === 0) {
-        return res.status(404).json({ message: 'No properties found for this landlord' });
-      }
-  
-      // Get all bookings for the landlord's properties
-      const propertyIds = properties.map((property) => property._id);
-      const bookedProperties = await BookedProperty.find({
-        property: { $in: propertyIds },
-      })
-        .populate('property', 'propertyName') 
-        .populate('bookings.user', 'firstName lastName email'); 
-  
-      if (!bookedProperties || bookedProperties.length === 0) {
-        return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
-      }
-  
-      // Prepare the bookings data, using checkInDate as the booking date
-      const bookings = bookedProperties.flatMap((bookedProperty) =>
-        bookedProperty.bookings.map((booking) => ({
+  const { landlordId } = req.params; // We get the landlordId from the URL params
+
+  try {
+    // Ensure that the landlord exists
+    const landlord = await User.findById(landlordId);
+    if (!landlord || landlord.accountType !== 'landlord') {
+      return res.status(404).json({ message: 'Landlord not found' });
+    }
+
+    // Find all properties that belong to the landlord
+    const properties = await Property.find({ userId: landlordId });
+    if (properties.length === 0) {
+      return res.status(404).json({ message: 'No properties found for this landlord' });
+    }
+
+    // Get all bookings for the landlord's properties
+    const propertyIds = properties.map((property) => property._id);
+    const bookedProperties = await BookedProperty.find({
+      property: { $in: propertyIds },
+    })
+      .populate('property', 'propertyName') 
+      .populate('bookings.user', 'firstName lastName email'); 
+
+    if (!bookedProperties || bookedProperties.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
+    }
+
+    // Prepare the bookings data, using checkInDate as the booking date
+    const bookings = bookedProperties.flatMap((bookedProperty) =>
+      bookedProperty.bookings
+        .filter(booking => booking.user) // Filter out any bookings without a user
+        .map((booking) => ({
           bookingId: booking._id,
           propertyName: bookedProperty.property.propertyName,
           tenantName: `${booking.user.firstName} ${booking.user.lastName}`,
@@ -45,13 +48,16 @@ export const getBookingsByLandlord = async (req, res) => {
           paymentMethod: booking.paymentMethod,
           paymentDetails: booking.paymentDetails,
         }))
-      );
-  
-      res.status(200).json({ bookings });
-    } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
-    }
-  };
+    );
+
+    res.status(200).json({ bookings });
+  } catch (error) {
+    console.error(`Server error while fetching bookings for landlordId: ${landlordId}`, error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
   
 
 //Update the booking status
