@@ -20,7 +20,7 @@ const LandlordViewProfile = () => {
 
 
   const user = JSON.parse(localStorage.getItem('user'));
-  const userId = user?.id;
+  const userId = user?.id || null;
 
   const navigate = useNavigate();
 
@@ -150,7 +150,6 @@ const LandlordViewProfile = () => {
     };
 
 
-  
   return (
     <div>
       <LandlordNavbar />
