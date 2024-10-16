@@ -150,6 +150,7 @@ const LandlordViewProfile = () => {
     };
 
 
+  
   return (
     <div>
       <LandlordNavbar />
@@ -226,7 +227,7 @@ const LandlordViewProfile = () => {
         <p className="mb-2">Last updated: September 5, 2024</p>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => handleViewBookings(user.id)}
+          onClick={() => handleViewBookings(userId)}
         >
           View Bookings ({pendingCount} pending, {confirmedCount} confirmed)
         </button>
@@ -349,7 +350,7 @@ const LandlordViewProfile = () => {
         </div>
       )}
       
-      {/* Add the BookingAndProperty component below the profile */}
+
       <BookingAndProperty />
 
     </div>
