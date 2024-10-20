@@ -12,7 +12,7 @@ const TenantNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear the user from localStorage
-    navigate('/'); // Redirect to the login page
+    navigate('/signin'); // Redirect to the login page
   };
 
   useEffect(() => {
