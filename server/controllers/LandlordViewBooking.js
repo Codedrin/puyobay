@@ -3,38 +3,41 @@ import Property from '../models/addNewProperty.js';
 import BookedProperty from '../models/bookedProperty.js';
 import sendEmail from '../utils/sendEmail.js';
 
-// Controller to get bookings for landlord's properties
+
+// Controller to get bookings for landlord's properties// Controller to get bookings for landlord's properties
 export const getBookingsByLandlord = async (req, res) => {
-    const { landlordId } = req.params; // We get the landlordId from the URL params
-  
-    try {
-      // Ensure that the landlord exists
-      const landlord = await User.findById(landlordId);
-      if (!landlord || landlord.accountType !== 'landlord') {
-        return res.status(404).json({ message: 'Landlord not found' });
-      }
-  
-      // Find all properties that belong to the landlord
-      const properties = await Property.find({ userId: landlordId });
-      if (properties.length === 0) {
-        return res.status(404).json({ message: 'No properties found for this landlord' });
-      }
-  
-      // Get all bookings for the landlord's properties
-      const propertyIds = properties.map((property) => property._id);
-      const bookedProperties = await BookedProperty.find({
-        property: { $in: propertyIds },
-      })
-        .populate('property', 'propertyName') 
-        .populate('bookings.user', 'firstName lastName email'); 
-  
-      if (!bookedProperties || bookedProperties.length === 0) {
-        return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
-      }
-  
-      // Prepare the bookings data, using checkInDate as the booking date
-      const bookings = bookedProperties.flatMap((bookedProperty) =>
-        bookedProperty.bookings.map((booking) => ({
+  const { landlordId } = req.params; // We get the landlordId from the URL params
+
+  try {
+    // Ensure that the landlord exists
+    const landlord = await User.findById(landlordId);
+    if (!landlord || landlord.accountType !== 'landlord') {
+      return res.status(404).json({ message: 'Landlord not found' });
+    }
+
+    // Find all properties that belong to the landlord
+    const properties = await Property.find({ userId: landlordId });
+    if (properties.length === 0) {
+      return res.status(404).json({ message: 'No properties found for this landlord' });
+    }
+
+    // Get all bookings for the landlord's properties
+    const propertyIds = properties.map((property) => property._id);
+    const bookedProperties = await BookedProperty.find({
+      property: { $in: propertyIds },
+    })
+      .populate('property', 'propertyName') 
+      .populate('bookings.user', 'firstName lastName email'); 
+
+    if (!bookedProperties || bookedProperties.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
+    }
+
+    // Prepare the bookings data, using checkInDate as the booking date
+    const bookings = bookedProperties.flatMap((bookedProperty) =>
+      bookedProperty.bookings
+        .filter(booking => booking.user) // Filter out any bookings without a user
+        .map((booking) => ({
           bookingId: booking._id,
           propertyName: bookedProperty.property.propertyName,
           tenantName: `${booking.user.firstName} ${booking.user.lastName}`,
@@ -45,13 +48,16 @@ export const getBookingsByLandlord = async (req, res) => {
           paymentMethod: booking.paymentMethod,
           paymentDetails: booking.paymentDetails,
         }))
-      );
-  
-      res.status(200).json({ bookings });
-    } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
-    }
-  };
+    );
+
+    res.status(200).json({ bookings });
+  } catch (error) {
+    console.error(`Server error while fetching bookings for landlordId: ${landlordId}`, error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
   
 
 //Update the booking status
@@ -117,64 +123,108 @@ export const getBookingsByLandlord = async (req, res) => {
 
 // getLandlordDashboardData
 export const getLandlordDashboardData = async (req, res) => {
-  const { landlordId } = req.params; 
+  const { landlordId } = req.params;
 
   try {
-      const landlord = await User.findById(landlordId);
-      if (!landlord || landlord.accountType !== 'landlord') {
-          return res.status(404).json({ message: 'Landlord not found' });
-      }
+    const landlord = await User.findById(landlordId);
+    if (!landlord || landlord.accountType !== 'landlord') {
+      return res.status(404).json({ message: 'Landlord not found' });
+    }
 
-      const properties = await Property.find({ userId: landlordId });
-      if (properties.length === 0) {
-          return res.status(404).json({ message: 'No properties found for this landlord' });
-      }
+    const properties = await Property.find({ userId: landlordId });
+    if (properties.length === 0) {
+      return res.status(404).json({ message: 'No properties found for this landlord' });
+    }
 
-      const propertyIds = properties.map((property) => property._id);
-      const bookedProperties = await BookedProperty.find({
-          property: { $in: propertyIds },
-      })
-      .populate('property', 'propertyName') 
-      .populate('bookings.user', 'firstName lastName email address phoneNumber'); 
+    const propertyIds = properties.map((property) => property._id);
+    const bookedProperties = await BookedProperty.find({
+      property: { $in: propertyIds },
+    })
+      .populate('property', 'propertyName price') // Get property price and name
+      .populate('bookings.user', 'firstName lastName email address phoneNumber');
 
-      if (!bookedProperties || bookedProperties.length === 0) {
-          return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
-      }
+    if (!bookedProperties || bookedProperties.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this landlord\'s properties' });
+    }
 
-      // Preparing tenants data
-      const tenants = bookedProperties.flatMap((bookedProperty) =>
-          bookedProperty.bookings.map((booking) => ({
-              userId: booking.user._id, 
-              name: `${booking.user.firstName} ${booking.user.lastName}`,
-              address: booking.user.address,
-              phoneNumber: booking.user.phoneNumber,
-              email: booking.user.email,
-              bookingDate: booking.checkInDate,
-              status: booking.status ? 'Paid' : 'Pending',
-          }))
-      );
+    // Preparing tenants data
+    const tenants = bookedProperties.flatMap((bookedProperty) =>
+      bookedProperty.bookings.map((booking) => ({
+        userId: booking.user._id,
+        name: `${booking.user.firstName} ${booking.user.lastName}`,
+        address: booking.user.address,
+        phoneNumber: booking.user.phoneNumber,
+        email: booking.user.email,
+        bookingDate: booking.checkInDate,
+        status: booking.status ? 'Paid' : 'Pending',
+        price: booking.status ? bookedProperty.property.price : 0, // Only include the price if the status is true (paid)
+        checkInDate: booking.checkInDate,
+        checkOutDate: booking.checkOutDate,
+        updatedAt: booking.updatedAt, // Track when the booking was updated
+      }))
+    );
 
-      // Aggregate check-ins and check-outs info
-      const checkInOut = {
-          checkIns: tenants.filter(t => new Date(t.bookingDate) <= new Date()).length, 
-          checkOuts: tenants.filter(t => new Date(t.bookingDate) > new Date()).length, 
-      };
+    // Cancellation history
+    const cancellations = bookedProperties.flatMap((bookedProperty) =>
+      bookedProperty.bookings.flatMap((booking) =>
+        booking.cancellations.map((cancellation) => ({
+          bookingId: booking._id,
+          cancellationReason: cancellation.cancellationReason,
+          canceledAt: cancellation.canceledAt,
+        }))
+      )
+    );
 
-      // Aggregate payment information
-      const payments = {
-          paid: tenants.filter(t => t.status === 'Paid').length,
-          pending: tenants.filter(t => t.status === 'Pending').length,
-      };
+    // Aggregate booking info based on dates
+    const today = new Date();
+    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-      res.status(200).json({
-          tenants,
-          checkInOut,
-          payments,
-      });
+    const dailyCheckIns = tenants.filter(
+      (t) => new Date(t.checkInDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+    );
+    const dailyCheckOuts = tenants.filter(
+      (t) => new Date(t.checkOutDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+    );
+
+    const weeklyCheckIns = tenants.filter((t) => new Date(t.checkInDate) >= startOfWeek);
+    const weeklyCheckOuts = tenants.filter((t) => new Date(t.checkOutDate) >= startOfWeek);
+
+    const monthlyCheckIns = tenants.filter((t) => new Date(t.checkInDate) >= startOfMonth);
+    const monthlyCheckOuts = tenants.filter((t) => new Date(t.checkOutDate) >= startOfMonth);
+
+    // Updated Daily Income Calculation: If status is "Paid" and updated today
+    const dailyIncome = tenants
+      .filter((t) => t.status === 'Paid' && new Date(t.updatedAt).toISOString().split('T')[0] === new Date().toISOString().split('T')[0])
+      .reduce((total, tenant) => total + tenant.price, 0);
+
+    const weeklyIncome = tenants
+      .filter((t) => t.status === 'Paid' && new Date(t.updatedAt) >= startOfWeek)
+      .reduce((total, tenant) => total + tenant.price, 0);
+
+    const monthlyIncome = tenants
+      .filter((t) => t.status === 'Paid' && new Date(t.updatedAt) >= startOfMonth)
+      .reduce((total, tenant) => total + tenant.price, 0);
+
+    // Payments
+    const paidPayments = tenants.filter((t) => t.status === 'Paid').length;
+    const pendingPayments = tenants.filter((t) => t.status === 'Pending').length;
+
+    res.status(200).json({
+      tenants,
+      dailyCheckIns: dailyCheckIns.length,
+      dailyCheckOuts: dailyCheckOuts.length,
+      weeklyCheckIns: weeklyCheckIns.length,
+      weeklyCheckOuts: weeklyCheckOuts.length,
+      monthlyCheckIns: monthlyCheckIns.length,
+      monthlyCheckOuts: monthlyCheckOuts.length,
+      dailyIncome,
+      weeklyIncome,
+      monthlyIncome,
+      payments: { paid: paidPayments, pending: pendingPayments },
+      cancellations, // Include cancellations in the response
+    });
   } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
-
-
-

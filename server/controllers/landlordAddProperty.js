@@ -1,45 +1,76 @@
 import Property from "../models/addNewProperty.js";
 
-// Add New Property
+
 export const addProperty = async (req, res) => {
-    const { propertyName, description, address, price, availableRooms, area, images, userId } = req.body; 
+  const {
+    propertyName,
+    description,
+    address,
+    price,
+    availableRooms,
+    area,
+    latitude,
+    longitude,
+    propertyType,
+    propertyArea,
+    images,
+    gcashQr, // GCash QR Code
+    userId,
+  } = req.body;
+
+  // Check if userId is present
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  // Backend validation for numeric fields
+  const priceAsNumber = parseFloat(price);
+  const availableRoomsAsNumber = parseInt(availableRooms, 10);
+  const areaAsNumber = parseFloat(area);
+
+  // Validate if the values are valid numbers
+  if (isNaN(priceAsNumber) || isNaN(availableRoomsAsNumber) || isNaN(areaAsNumber)) {
+    return res.status(400).json({ message: 'Price, Available Rooms, and Area must be valid numbers' });
+  }
+
+  try {
+    // Ensure that images is an array of objects with url and publicId
+    if (!Array.isArray(images) || images.length === 0 || !images[0].url) {
+      return res.status(400).json({ message: 'Invalid images data. Expecting an array of objects with "url" and "publicId".' });
+    }
+
+    // Ensure gcashQr is an object with url and publicId
+    if (!gcashQr || !gcashQr.url || !gcashQr.publicId) {
+      return res.status(400).json({ message: 'Invalid GCash QR code data. Expecting an object with "url" and "publicId".' });
+    }
+
+    // Create new property
+    const newProperty = new Property({
+      propertyName,
+      description,
+      address,
+      price: priceAsNumber, // Store validated price as number
+      availableRooms: availableRoomsAsNumber, // Store validated availableRooms as number
+      area: areaAsNumber, // Store validated area as number
+      lat: latitude,
+      lang: longitude,
+      type: propertyType,
+      selectArea: propertyArea,
+      images,
+      gcashQrCode: [gcashQr],
+      userId,
+    });
     
-    // Log to check the incoming data
-    console.log('Received property data:', { propertyName, description, address, price, availableRooms, area, images, userId });
-  
-    if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-  
-    try {
-      // Ensure that images is an array of objects with url and publicId
-      if (!Array.isArray(images) || images.length === 0 || !images[0].url) {
-        return res.status(400).json({ message: 'Invalid images data. Expecting an array of objects with "url" and "publicId".' });
-      }
-  
-      // Create new property
-      const newProperty = new Property({
-        propertyName,
-        description,
-        address,
-        price,
-        availableRooms,
-        area,
-        images, // Already uploaded Cloudinary URLs
-        userId, // Use the userId from the body
-      });
-  
-      const savedProperty = await newProperty.save();
-      res.status(201).json(savedProperty);
-    } catch (error) {
-      console.error('Error adding property:', error);
-      res.status(500).json({ message: 'Error adding property', error });
-    }
-  };
-  
-  
-  
-  
+    const savedProperty = await newProperty.save();
+
+    // Respond with the saved property
+    res.status(201).json(savedProperty);
+  } catch (error) {
+    console.error('Error adding property:', error);
+    res.status(500).json({ message: 'Error adding property', error });
+  }
+};
+
   
 
 // Get Properties by User ID

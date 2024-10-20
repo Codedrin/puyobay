@@ -6,7 +6,7 @@ const PropertyAuth = ({ children }) => {
   
     if (!user) {
       // If no user is found in localStorage, redirect to the login page
-      return <Navigate to="/" replace />;
+      return <Navigate to="/signin" replace />;
     }
   
     // If the user is authenticated, render the children components (protected page)

@@ -33,9 +33,8 @@ const propertySchema = new mongoose.Schema({
       enum: ['San Isidro', 'Del Carmen'], // Only San Isidro and Del Carmen are allowed
     },
     
-    
     roomArea: {
-      type: Number,
+      type: String,
       required: false,
     },
     
@@ -46,9 +45,13 @@ const propertySchema = new mongoose.Schema({
       enum: ['House', 'Apartment'], // Only 'House' and 'Apartment' allowed
     },
 
-    price: {
-      type: Number,
-      required: false,
+    lat: {
+      type: String,
+      required: true, 
+    },
+    lang: {
+      type: String,
+      required: true, 
     },
 
     images: [
@@ -63,6 +66,19 @@ const propertySchema = new mongoose.Schema({
         },
       },
     ],
+    gcashQrCode: [
+      {
+        publicId: {
+          type: String,
+          required: true
+        },
+        url: {
+          type: String,
+          required: true
+        }
+      }
+    ],
+  
     ratings: [
       {
         userId: {
