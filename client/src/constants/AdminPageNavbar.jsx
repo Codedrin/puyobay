@@ -12,7 +12,7 @@ const AdminPageNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken'); // Clear the admin token from localStorage
-    navigate('/'); // Redirect to the login page
+    navigate('/signin'); // Redirect to the login page
   };
 
   const handleClickOutside = (event) => {
