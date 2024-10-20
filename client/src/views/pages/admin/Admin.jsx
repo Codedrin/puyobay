@@ -15,7 +15,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
         setLandlords(response.data.landlords);
         setTotalLandlords(response.data.totalLandlords); // Fetch total landlords from the backend
         setTotalTenants(response.data.totalTenants); // Fetch total tenants from the backend

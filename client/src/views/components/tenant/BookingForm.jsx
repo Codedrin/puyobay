@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import TenantNavbar from '../../../constants/TenantNabar';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,10 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { qr } from '../../../assets';
+
 
 const BookingForm = () => {
     const { propertyId } = useParams();
+    const [property, setProperty] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         age: '',
@@ -35,6 +36,20 @@ const BookingForm = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user ? user.id : null;  
 
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/property/${propertyId}`);
+                setProperty(response.data);
+            } catch (error) {
+                console.error('Error fetching property:', error);
+                toast.error('Failed to fetch property details');
+            }
+        };
+
+        fetchProperty();
+    }, [propertyId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -230,8 +245,6 @@ const BookingForm = () => {
                         >
                             <option value="">Select Payment Method</option>
                             <option value="GCash">GCash</option>
-                            <option value="CreditCard">Credit Card</option>
-                            <option value="PayPal">PayPal</option>
                         </select>
                     </div>
 
@@ -256,7 +269,11 @@ const BookingForm = () => {
                             <p className="text-red-500 font-semibold mb-4 text-center">
                                 Please scan the QR code below and pay the exact amount. You will receive an email confirmation within 24 hours.
                             </p>
-                            <img src={qr} alt="QR Code for GCash" className="w-48 h-48 mb-4" />
+                            <img
+                                src={property.gcashQrCode?.[0]?.url}
+                                alt="QR Code for GCash"
+                                className="w-48 h-48 mb-4"
+                            />
                         </div>
                         <div className="flex flex-col space-y-4">
                             <input

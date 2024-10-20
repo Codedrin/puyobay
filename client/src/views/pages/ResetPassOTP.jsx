@@ -45,11 +45,13 @@ const ResetPassOTP = () => {
       setOtp(new Array(6).fill("")); // Reset OTP input
       setTimeLeft(30); // Reset the timer
       setCanResend(false); // Disable resend button
+      setErrorMessage(''); // Clear previous error message
 
       // Resend OTP via API call
-      await axios.post(`http://localhost:5000/api/users/resend-otp/${userId}`);
+      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/resend-otp/${userId}`);
     } catch (error) {
       console.error('Error resending OTP:', error);
+      setErrorMessage('Error resending OTP');
     }
   };
 
@@ -61,7 +63,7 @@ const ResetPassOTP = () => {
     const otpValue = otp.join(""); // Convert OTP array into a single string
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/verify-otp', { otp: otpValue, userId });
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/verify-otp`, { otp: otpValue, userId });
       setMessage(response.data.message);
       setLoading(false);
 

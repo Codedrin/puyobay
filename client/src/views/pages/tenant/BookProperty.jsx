@@ -37,7 +37,7 @@ const BookProperty = () => {
         // Fetch other properties for the carousel
         const fetchOtherProperties = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/users/get-properties');
+            const response = await fetch('http://:5000/api/users/get-properties');
             const data = await response.json();
             // Select only 5 properties to display in the carousel
             setOtherProperties(data.slice(0, 5));

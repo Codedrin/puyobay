@@ -81,7 +81,7 @@ const TenantViewProfile = () => {
       }
   
       // Send the cancellation reason as data in the DELETE request
-      await axios.delete(`http://localhost:5000/api/users/cancel-booking/${userId}/${selectedBookingId}`, {
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/cancel-booking/${userId}/${selectedBookingId}`, {
         data: { cancellationReason },
       });
   
