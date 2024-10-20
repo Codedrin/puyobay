@@ -69,7 +69,7 @@ const LandlordViewBooking = () => {
     return <div>Loading bookings...</div>;
   }
 
-  return (
+ return (
     <div>
       <LandlordNavbar />
       <ToastContainer />
