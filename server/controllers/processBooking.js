@@ -92,41 +92,49 @@ export const processBooking = async (req, res) => {
   }
 };
 
-//Cancel or Remove Booking
-export const deleteBooking = async (req, res) => {
+//Cancel or Remove Booking// Cancel a booking and save it to the cancellation history
+export const cancelBooking = async (req, res) => {
   const { userId, bookingId } = req.params;
+  const { cancellationReason } = req.body;
 
   try {
-    // Find user by ID
+    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Find the booking within the booked property
+    // Find the property that has the booking
     const bookedProperty = await BookedProperty.findOne({ "bookings._id": bookingId });
 
     if (!bookedProperty) {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Filter out the booking that matches the bookingId
-    bookedProperty.bookings = bookedProperty.bookings.filter(
-      booking => booking._id.toString() !== bookingId
-    );
-
-    // If the bookings array is now empty, you might want to delete the whole property booking
-    if (bookedProperty.bookings.length === 0) {
-      await BookedProperty.findByIdAndDelete(bookedProperty._id); // Optionally delete the whole entry if no bookings left
-    } else {
-      await bookedProperty.save(); // Save the updated property if bookings remain
+    // Find the specific booking within the booked property
+    const booking = bookedProperty.bookings.id(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
     }
 
-    res.status(200).json({ message: 'Booking deleted successfully' });
+    // Save cancellation details in the booking's cancellations array
+    booking.cancellations.push({
+      canceledAt: new Date(),
+      cancellationReason: cancellationReason,
+    });
+
+    // Optionally: Change booking status (e.g., mark it as canceled)
+    booking.status = false; // Mark as canceled
+
+    // Save the updated booked property
+    await bookedProperty.save();
+
+    res.status(200).json({ message: 'Booking canceled and saved to history', booking });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Error canceling booking', error });
   }
 };
+
 
 
 // Controller to get all bookings by user ID

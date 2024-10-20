@@ -6,14 +6,16 @@ import { addProperty, getPropertiesByUser, getPropertyById, updateProperty, dele
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
 import { getAllProperties } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
-import { processBooking, deleteBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
+import { processBooking, cancelBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
 import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
+import { resetPassword } from '../controllers/userController.js';
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
 router.post('/login', loginUser );
 router.post('/forgot', forgotPassword);
+router.post('/reset-password', resetPassword);
 router.get('/', getUsersByType);
 // Admin
 router.delete('/deny/:landlordId', denyLandlord);
@@ -40,7 +42,7 @@ router.get('/get-propertiesId/:id', getBookPropertyById);
 router.post('/submitrating/:id/rate', submitRating);
 router.get('/get-average-ratings', getAverageRatings);
 router.post('/process-booking', upload.single('receipt'), processBooking);
-router.delete('/delete-booking/:userId/:bookingId', deleteBooking);
+router.delete('/cancel-booking/:userId/:bookingId', cancelBooking);
 router.get('/bookings/:userId', getBookingsByUserId);
 
 //UserOTP

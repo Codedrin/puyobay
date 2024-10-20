@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+const cancellationSchema = new mongoose.Schema({
+  canceledAt: {
+    type: Date,
+    required: true,
+  },
+  cancellationReason: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+});
+
 const bookingSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId, 
@@ -79,11 +91,12 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean, 
     default: false, 
   },
+  cancellations: [cancellationSchema], // Array of cancellation events
 }, {
   timestamps: true, 
 });
 
-// Define the schema for a property with multiple bookings
+// Define the schema for a property with multiple bookings and cancellation history
 const bookedPropertySchema = new mongoose.Schema({
   property: {
     type: mongoose.Schema.Types.ObjectId, 

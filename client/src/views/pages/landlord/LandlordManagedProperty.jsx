@@ -62,13 +62,25 @@ const LandlordManagedProperty = () => {
     }
   };
 
+  const handleAddProperty = () => {
+    // Navigate to the "Add Property" page
+    navigate('/add-property');
+  };
 
   return (
     <div>
       <LandlordNavbar />
       <ToastContainer />
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-6">Manage Properties</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Manage Properties</h1>
+          <button
+            onClick={handleAddProperty}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+          >
+            + Add Property
+          </button>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {properties.map((property) => (
             <div key={property._id} className="border rounded-lg p-4 shadow-lg">
@@ -88,13 +100,13 @@ const LandlordManagedProperty = () => {
                   View
                 </button>
                 <button
-                  onClick={() => handleUpdate(property._id)} // Properly invoke the function here
+                  onClick={() => handleUpdate(property._id)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                 >
                   Update
                 </button>
-                  <button
-                  onClick={() => handleDelete(property._id)} // Delete property
+                <button
+                  onClick={() => handleDelete(property._id)}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg"
                 >
                   Delete

@@ -1,26 +1,26 @@
-    import React, { useEffect, useState } from 'react';
-    import { useParams } from 'react-router-dom';
-    import { toast, ToastContainer } from 'react-toastify';
-    import { useNavigate } from 'react-router-dom'; 
-    import 'react-toastify/dist/ReactToastify.css'; 
-    import TenantNavbar from '../../../constants/TenantNabar'; 
-    import Slider from 'react-slick'; 
-    import 'slick-carousel/slick/slick.css';
-    import 'slick-carousel/slick/slick-theme.css';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'; 
+import 'react-toastify/dist/ReactToastify.css'; 
+import TenantNavbar from '../../../constants/TenantNabar'; 
+import Slider from 'react-slick'; 
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
-    const BookProperty = () => {
-    const { propertyId } = useParams(); 
-    const [property, setProperty] = useState(null);
-    const [otherProperties, setOtherProperties] = useState([]); 
-    const [rating, setRating] = useState(0); // Store the rating input from the user
-    const navigate = useNavigate(); 
-    // Get user data from local storage
-    const getUserFromLocalStorage = () => {
-        const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
-    };
+const BookProperty = () => {
+  const { propertyId } = useParams(); 
+  const [property, setProperty] = useState(null);
+  const [otherProperties, setOtherProperties] = useState([]); 
+  const [rating, setRating] = useState(0); 
+  const navigate = useNavigate(); 
 
-    const user = getUserFromLocalStorage();
+  const getUserFromLocalStorage = () => {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  };
+
+  const user = getUserFromLocalStorage();
 
     useEffect(() => {
         // Fetch property details
@@ -63,12 +63,11 @@
         fetchOtherPropertiesWithRatings();
     }, [propertyId]);
 
-    // Submit Rating Function
-    const submitRating = async () => {
-        if (!user) {
-        toast.error('You must be logged in to submit a rating');
-        return;
-        }
+  const submitRating = async () => {
+    if (!user) {
+      toast.error('You must be logged in to submit a rating');
+      return;
+    }
 
         try {
         const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/users/submitrating/${propertyId}/rate`, {
@@ -79,162 +78,192 @@
             body: JSON.stringify({ rating, userId: user.id }),
         });
 
-        const data = await response.json();
-        if (response.ok) {
-            toast.success(data.message);
-        } else {
-            toast.error('Failed to submit rating. Please try again.');
-        }
-        } catch (error) {
-        console.error('Error submitting rating:', error);
-        toast.error('An error occurred while submitting the rating.');
-        }
-    };
-
-    if (!property) {
-        return <div>Loading...</div>;
+      const data = await response.json();
+      if (response.ok) {
+        toast.success(data.message);
+      } else {
+        toast.error('Failed to submit rating. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      toast.error('An error occurred while submitting the rating.');
     }
+  };
 
+  if (!property) {
+    return <div>Loading...</div>;
+  }
 
-        // Function to render star rating based on averageRating
-        const renderStars = (rating) => {
-            const stars = [];
-            for (let i = 0; i < 5; i++) {
-            stars.push(
-                <span key={i} className={i < rating ? 'text-yellow-500' : 'text-gray-300'}>
-                ★
-                </span>
-            );
-            }
-            return stars;
-        };
-  
-    const handleBook = (propertyId) => {
-        navigate(`/book-property/${propertyId}`); // Navigate using useNavigate
-    };
+  // Function to render star rating based on averageRating
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <span key={i} className={i < rating ? 'text-yellow-500' : 'text-gray-300'}>
+          ★
+        </span>
+      );
+    }
+    return stars;
+  };
 
-    const handleBookingForm = () => {
-        navigate(`/book-house/${propertyId}`); // Navigate to the booking form route
-      };
-      
-    // Settings for react-slick carousel with responsive breakpoints
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3, // Show 3 slides at once on desktop
-        slidesToScroll: 2, // Scroll one slide at a time
-        autoplay: true,
-        autoplaySpeed: 3000,
-        responsive: [
-        {
-            breakpoint: 1024, // For screens less than 1024px
-            settings: {
-            slidesToShow: 2, // Show 2 slides on tablet
-            slidesToScroll: 1,
-            },
+  const handleBook = (propertyId) => {
+    navigate(`/book-property/${propertyId}`);
+  };
+
+  const handleBookingForm = () => {
+    navigate(`/book-house/${propertyId}`);
+  };
+
+  // Settings for react-slick carousel for property images
+  const propertyImageSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1, // Show one image at a time for the property
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+  };
+
+  // Settings for react-slick carousel for other properties
+  const otherPropertySettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3, // Show 3 other properties at a time
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
         },
-        {
-            breakpoint: 768, // For screens less than 768px (mobile)
-            settings: {
-            slidesToShow: 1, // Show 1 slide on mobile
-            slidesToScroll: 1,
-            },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
         },
-        ],
-    };
+      },
+    ],
+  };
 
- 
-    return (
-        <>
-        <TenantNavbar /> {/* Render the Tenant Navbar */}
-        <div className="container mx-auto py-10">
-            <ToastContainer position="top-right" autoClose={5000} /> {/* This will render the toasts */}
+  return (
+    <>
+      <TenantNavbar />
+      <div className="container mx-auto py-10">
+        <ToastContainer position="top-right" autoClose={5000} />
 
-            <h2 className="text-3xl font-bold text-blue-600">{property.propertyName}</h2>
-            <div className="flex flex-col md:flex-row gap-6 mt-6">
-            <img
+        <h2 className="text-3xl font-bold text-blue-600">{property.propertyName}</h2>
+
+        <div className="flex flex-col md:flex-row gap-6 mt-6">
+          {/* Check if there are multiple images to display a carousel */}
+          <div className="w-full md:w-1/2">
+            {property.images.length > 1 ? (
+              <Slider {...propertyImageSettings}>
+                {property.images.map((image, index) => (
+                  <div key={index}>
+                    <img
+                      src={image.url}
+                      alt={`Property image ${index + 1}`}
+                      className="w-full h-80 object-cover rounded-lg"
+                    />
+                  </div>
+                ))}
+              </Slider>
+            ) : (
+              <img
                 src={property.images[0]?.url}
-                alt={property.propertyName}
-                className="w-full md:w-1/2 h-auto object-cover"
-            />
-           <div className="md:w-1/2">
-                <p><strong>Available Rooms:</strong> {property.availableRooms}</p>
-                <p><strong>Price:</strong> ₱{property.price}</p>
-                <p><strong>Details:</strong> {property.description}</p>
-                <p><strong>Area:</strong> {property.area} sq ft</p>
-                <p><strong>Address:</strong> {property.address}</p>
-                <div className="flex items-center space-x-4 mt-4">
+                alt={`Property image`}
+                className="w-full h-80 object-cover rounded-lg"
+              />
+            )}
+          </div>
+
+          <div className="md:w-1/2">
+            <p><strong>Available Rooms:</strong> {property.availableRooms}</p>
+            <p><strong>Price:</strong> ₱{property.price}</p>
+            <p><strong>Details:</strong> {property.description}</p>
+            <p><strong>Area:</strong> {property.area} sq ft</p>
+            <p><strong>Address:</strong> {property.address}</p>
+
+            <div className="flex items-center space-x-4 mt-4">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={() => navigate('/properties')}
+              >
+                Back
+              </button>
+
+              <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleBookingForm}>
+                Book Now
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <h3 className="text-2xl font-bold">Rate this property:</h3>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => setRating(star)}
+                className={`text-3xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+            onClick={submitRating}
+          >
+            Submit Rating
+          </button>
+        </div>
+
+        <div className="mt-10">
+          <h3 className="text-2xl font-bold mb-4">Other Properties You May Like</h3>
+          <Slider {...otherPropertySettings}>
+            {otherProperties.map((prop) => (
+              <div key={prop._id} className="p-2">
+                <div className="bg-white shadow-lg rounded-lg overflow-hidden h-full flex flex-col justify-between">
+                  <img src={prop.images[0]?.url} alt={prop.propertyName} className="w-full h-40 object-cover rounded-lg" />
+                  <div className="p-4 flex flex-col justify-between h-full">
+                    <h3 className="text-xl font-bold">{prop.propertyName}</h3>
+                    <p className="text-gray-600 mb-2">{prop.description}</p>
+                    <div className="flex mb-2">{renderStars(prop.averageRating || 0)}</div>
+                    <p><strong>Price:</strong> ₱{prop.price}</p>
+                    <p><strong>Rooms Available:</strong> {prop.availableRooms}</p>
+                    <p><strong>Area:</strong> {prop.area} sq ft</p>
                     <button
-                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                        onClick={() => navigate('/properties')}
+                      className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
+                      onClick={() => handleBook(prop._id)}
                     >
-                        Back
+                      View
                     </button>
-
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleBookingForm}>
-                        Book Now
-                    </button>
+                  </div>
                 </div>
-            </div>
-            </div>
+              </div>
+            ))}
+          </Slider>
+        </div>
 
-            <div className="mt-8">
-            <h3 className="text-2xl font-bold">Rate this property:</h3>
-            <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className={`text-3xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
-                >
-                    ★
-                </button>
-                ))}
-            </div>
-            <button
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-                onClick={submitRating}
-            >
-                Submit Rating
-            </button>
-            </div>
+        <br />
 
-
-                        <div className="mt-10">
-            <h3 className="text-2xl font-bold mb-4">Other Properties You May Like</h3>
-            <Slider {...settings}>
-                {otherProperties.map((prop) => (
-                <div key={prop._id} className="p-2">
-                    <div className="bg-white shadow-lg rounded-lg overflow-hidden h-full flex flex-col justify-between">
-                    <img src={prop.images[0]?.url} alt={prop.propertyName} className="w-full h-40 object-cover" />
-                    <div className="p-4 flex flex-col justify-between h-full">
-                        <h3 className="text-xl font-bold">{prop.propertyName}</h3>
-                        <p className="text-gray-600 mb-2">{prop.description}</p>
-                        <div className="flex mb-2">{renderStars(prop.averageRating || 0)}</div> {/* Use averageRating */}
-                        <p><strong>Price:</strong> ₱{property.price}</p>
-                      <p><strong>Rooms Available:</strong> {property.availableRooms}</p>
-                      <p><strong>Area:</strong> {property.area} sq ft</p>
-                        <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
-                        onClick={() => handleBook(prop._id)}> 
-                        View
-                        </button>
-                    </div>
-                    </div>
-                </div>
-                ))}
-            </Slider>
-            </div>
-
-            
-                <br />
-               {/* Footer Section */}
+        {/* Footer Section */}
         <div className="text-center mt-10">
           <p className="text-gray-600">&copy; 2024 PUYOBAY. All rights reserved.</p>
         </div>
-        </div>
-        </>
-    );
-    };
+      </div>
+    </>
+  );
+};
 
-    export default BookProperty;
+export default BookProperty;

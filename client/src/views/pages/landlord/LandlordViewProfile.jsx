@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LandlordNavbar from '../../../constants/LandlordNavbar';
-import BookingAndProperty from '../../components/landlord/BookingAndProperty';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
@@ -20,7 +19,7 @@ const LandlordViewProfile = () => {
 
 
   const user = JSON.parse(localStorage.getItem('user'));
-  const userId = user?.id;
+  const userId = user?.id || null;
 
   const navigate = useNavigate();
 
@@ -226,7 +225,7 @@ const LandlordViewProfile = () => {
         <p className="mb-2">Last updated: September 5, 2024</p>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => handleViewBookings(user.id)}
+          onClick={() => handleViewBookings(userId)}
         >
           View Bookings ({pendingCount} pending, {confirmedCount} confirmed)
         </button>
@@ -349,8 +348,6 @@ const LandlordViewProfile = () => {
         </div>
       )}
       
-      {/* Add the BookingAndProperty component below the profile */}
-      <BookingAndProperty />
 
     </div>
   );

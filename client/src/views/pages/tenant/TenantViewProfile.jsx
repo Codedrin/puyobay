@@ -3,41 +3,23 @@ import TenantNavbar from '../../../constants/TenantNabar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+
 const TenantViewProfile = () => {
   const [profile, setProfile] = useState({});
   const [expandedIndex, setExpandedIndex] = useState(null); // Manage which reservation is expanded
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state for profile
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // Modal for canceling a booking
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [selectedBookingId, setSelectedBookingId] = useState(null); // To store the selected booking for cancellation
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState([]);
-  const [bookingLoading, setBookingLoading] = useState(true); 
+  const [bookingLoading, setBookingLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
-
-
-
-  // Static reservations data
-  const reservations = [
-    {
-      propertyName: 'Beautiful Family Home',
-      checkIn: 'June 15, 2024',
-      checkOut: 'June 20, 2024',
-      numberOfGuests: 4,
-      totalPrice: 8500,
-      status: 'Confirmed',
-    },
-    {
-      propertyName: 'Cozy Cottage',
-      checkIn: 'July 5, 2024',
-      checkOut: 'July 10, 2024',
-      numberOfGuests: 2,
-      totalPrice: 5000,
-      status: 'Pending',
-    },
-  ];
-
 
   useEffect(() => {
     // Fetch profile data
@@ -49,7 +31,6 @@ const TenantViewProfile = () => {
         console.error('Error fetching profile:', error);
       }
     };
-
     fetchProfile();
   }, [userId]);
 
@@ -65,46 +46,61 @@ const TenantViewProfile = () => {
         setBookingLoading(false);
       }
     };
-
     fetchBookings();
   }, [userId]);
 
-    // Function to format the date to "October 11, 2024"
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
-    
-    // Function to handle click and toggle the visibility of reservation details
-    const toggleReservation = (index) => {
-      if (expandedIndex === index) {
-        setExpandedIndex(null); // Collapse if clicked again
-      } else {
-        setExpandedIndex(index); // Expand if not already expanded
-      }
-    };
-
-  // Function to handle cancellation of a booking
-  const handleCancelBooking = async (bookingId) => {
-    const confirmCancel = window.confirm('Are you sure you want to cancel this booking?');
-    if (!confirmCancel) return;
-
-    try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/delete-booking/${userId}/${bookingId}`);
-      setBookings(bookings.filter((booking) => booking._id !== bookingId));
-      toast.success('Booking cancelled successfully');
-    } catch (error) {
-      console.error('Error cancelling booking:', error);
-      toast.error('Failed to cancel booking');
+  const toggleReservation = (index) => {
+    if (expandedIndex === index) {
+      setExpandedIndex(null); // Collapse if clicked again
+    } else {
+      setExpandedIndex(index); // Expand if not already expanded
     }
   };
 
-  // Function to handle modal open/close
+  // Function to open the cancel modal with the selected booking ID
+  const openCancelModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setIsCancelModalOpen(true);
+  };
+
+  // Function to handle booking cancellation
+  const handleCancelBooking = async () => {
+    try {
+      if (!cancellationReason) {
+        toast.error('Please provide a reason for cancellation.');
+        return;
+      }
+  
+      // Send the cancellation reason as data in the DELETE request
+      await axios.delete(`http://localhost:5000/api/users/cancel-booking/${userId}/${selectedBookingId}`, {
+        data: { cancellationReason },
+      });
+  
+      // Remove the booking from the UI
+      setBookings(bookings.filter((booking) => booking._id !== selectedBookingId));
+      setIsCancelModalOpen(false); // Close modal
+      setCancellationReason(''); // Reset reason
+      toast.success('Booking canceled successfully');
+    } catch (error) {
+      console.error('Error canceling booking:', error);
+      toast.error('Failed to cancel booking');
+    }
+  };
+  
+  const closeCancelModal = () => {
+    setIsCancelModalOpen(false);
+    setCancellationReason('');
+  };
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
@@ -130,10 +126,9 @@ const TenantViewProfile = () => {
     }
   };
 
-  // Function to handle form submission for updating profile
   const handleUpdateProfile = async (event) => {
     event.preventDefault();
-      setLoading(true)
+    setLoading(true);
 
     let profilePictureData = profile.profilePicture;
 
@@ -152,7 +147,7 @@ const TenantViewProfile = () => {
     try {
       const updatedProfile = {
         ...profile,
-        profilePicture: profilePictureData // Update the profile picture with the new one (if uploaded)
+        profilePicture: profilePictureData, // Update the profile picture with the new one (if uploaded)
       };
 
       const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/update/${userId}`, updatedProfile);
@@ -167,10 +162,6 @@ const TenantViewProfile = () => {
     }
   };
 
-
-
-
-
   return (
     <div>
       <TenantNavbar />
@@ -181,14 +172,14 @@ const TenantViewProfile = () => {
           <div className="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-4 sm:space-y-0">
             {/* Profile Image */}
             <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-blue-700">
-            <img
-                    src={
-                    profile.profilePicture?.url ||
-                    'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'
-                    }
-                    alt="Landlord Profile"
-                    className="w-full h-full object-cover"
-                />
+              <img
+                src={
+                  profile.profilePicture?.url ||
+                  'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'
+                }
+                alt="Tenant Profile"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Profile Information */}
@@ -210,7 +201,7 @@ const TenantViewProfile = () => {
         </div>
       </div>
 
-      {/* Modal Section */}
+      {/* Modal Section for Profile Edit */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -276,8 +267,6 @@ const TenantViewProfile = () => {
         </div>
       )}
 
-
-  
       {/* Reservations Section */}
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4 text-blue-700">Previous Reservations</h2>
@@ -293,7 +282,7 @@ const TenantViewProfile = () => {
                   className={`w-full text-left bg-white text-blue-700 px-4 py-2 flex justify-between items-center transition-all duration-300 ease-in-out ${expandedIndex === index ? 'border border-blue-500' : ''}`}
                   onClick={() => toggleReservation(index)}
                 >
-                 <span className="font-semibold text-lg">{booking.propertyName}</span>
+                  <span className="font-semibold text-lg">{booking.propertyName}</span>
                   <span>{expandedIndex === index ? '⌄' : '⌃'}</span>
                 </button>
 
@@ -310,7 +299,7 @@ const TenantViewProfile = () => {
                       <p><strong>Payment Status:</strong> {booking.paymentStatus}</p>
                       <button
                         className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                        onClick={() => handleCancelBooking(booking._id)}
+                        onClick={() => openCancelModal(booking._id)}
                       >
                         Cancel Booking
                       </button>
@@ -322,6 +311,36 @@ const TenantViewProfile = () => {
           </div>
         )}
       </div>
+
+      {/* Cancel Booking Modal */}
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-semibold mb-4">Cancel Booking</h2>
+            <textarea
+              className="w-full border px-3 py-2 rounded-lg mb-4"
+              placeholder="Reason for cancellation"
+              value={cancellationReason}
+              onChange={(e) => setCancellationReason(e.target.value)}
+            />
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                onClick={closeCancelModal}
+              >
+                Close
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                onClick={handleCancelBooking}
+              >
+                Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upcoming Houses Section */}
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4">Upcoming New Houses</h2>
@@ -333,6 +352,7 @@ const TenantViewProfile = () => {
         <h2 className="text-2xl font-semibold mb-4">Favorite Properties</h2>
         <p>View and manage your favorite properties here.</p>
       </div>
+
       <ToastContainer />
     </div>
   );

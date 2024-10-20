@@ -106,9 +106,7 @@ export const registerUser = async (req, res) => {
 };
 
 
-
 //Signin
-
 export const loginUser = async (req, res) => {
   try {
     const { email, password, accountType } = req.body; // Get accountType from request
@@ -182,33 +180,69 @@ export const loginUser = async (req, res) => {
   }
 };
 
-//forgotPassword
 
+// Generate and send OTP for Forgot Password
 export const forgotPassword = async (req, res) => {
-  const { email, newPassword, confirmPassword } = req.body;
-
-  if (newPassword !== confirmPassword) {
-    return res.status(400).json({ message: 'Passwords do not match' });
-  }
+  const { email } = req.body;
 
   try {
-    // Find the user by email
+    // Check if user exists
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Generate OTP and expiry time
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpiresAt = Date.now() + 30 * 1000; // 30 seconds expiration
+
+    // Store OTP and expiry in the user's document
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+
+    // Send OTP to user's email
+    const message = `Your OTP for password reset is ${otp}. This OTP is valid for 30 seconds.`;
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset - OTP',
+      message,
+    });
+
+    // Return success with userId
+    res.status(200).json({ message: 'OTP sent to email', userId: user._id });
+  } catch (error) {
+    res.status(500).json({ message: 'Error sending OTP', error: error.message });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  const { userId, newPassword, confirmPassword } = req.body;
+
+  try {
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    // Find the user by their ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     // Update the user's password
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ success: true, message: "Password updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Error updating password", error: error.message });
   }
 };
 
@@ -272,6 +306,9 @@ export const getUsersByType = async (req, res) => {
         };
       });
 
+    // Count total landlords
+    const totalLandlords = landlords.length;
+
     // Map through tenants (no additional logic needed for tenants in this case)
     const tenants = users
       .filter(user => user.accountType === 'tenant')
@@ -282,15 +319,20 @@ export const getUsersByType = async (req, res) => {
         address: tenant.address,
       }));
 
-    res.status(200).json({ landlords, tenants });
+    // Count total tenants
+    const totalTenants = tenants.length;
+
+    // Send the response including total counts
+    res.status(200).json({ 
+      landlords, 
+      tenants, 
+      totalLandlords, 
+      totalTenants 
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching users', error: error.message });
   }
 };
-
-
-
-
 
 
 // Approve a landlord
