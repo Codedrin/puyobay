@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logo, image1 } from '../../../assets';
+import { logo, image1, display_img1, display_img2, display_img3, display_img4 } from '../../../assets';
 
 const TenantHeader = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const TenantHeader = () => {
       >
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black opacity-50"></div>
-        
+
         <div className="relative text-center text-white z-10">
           <h1 className="text-4xl font-bold">Welcome to Puyobay,</h1>
           <p className="text-xl mt-2">Where Comfort Meets Convenience!</p>
@@ -30,6 +30,57 @@ const TenantHeader = () => {
           </button>
         </div>
       </div>
+
+      <br /><br />
+      {/* Image Display Section with Animation and Hover Text */}
+      <section className="py-10">
+        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="relative group">
+            <img
+              src={display_img1}
+              alt="Image 1"
+              className="w-full h-64 object-cover rounded-lg transform transition duration-500 ease-in-out hover:scale-105"
+            />
+            {/* Text Overlay */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
+              <span className="text-white text-lg">Beautiful Poolside Villa</span>
+            </div>
+          </div>
+          <div className="relative group">
+            <img
+              src={display_img2}
+              alt="Image 2"
+              className="w-full h-64 object-cover rounded-lg transform transition duration-500 ease-in-out hover:scale-105 delay-200"
+            />
+            {/* Text Overlay */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
+              <span className="text-white text-lg">Luxury House with Garden</span>
+            </div>
+          </div>
+          <div className="relative group">
+            <img
+              src={display_img3}
+              alt="Image 3"
+              className="w-full h-64 object-cover rounded-lg transform transition duration-500 ease-in-out hover:scale-105 delay-400"
+            />
+            {/* Text Overlay */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
+              <span className="text-white text-lg">Modern Apartment</span>
+            </div>
+          </div>
+          <div className="relative group">
+            <img
+              src={display_img4}
+              alt="Image 4"
+              className="w-full h-64 object-cover rounded-lg transform transition duration-500 ease-in-out hover:scale-105 delay-600"
+            />
+            {/* Text Overlay */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
+              <span className="text-white text-lg">Spacious Living Room</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Subheader with Logo and About Us */}
       <section className="bg-white py-10">

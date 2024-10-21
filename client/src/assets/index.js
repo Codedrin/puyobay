@@ -23,7 +23,10 @@ import splash from '../assets/splash.png';
 import tenant from '../assets/tenant.jpg';
 import twoRoom from '../assets/two room.jpg';
 import img4 from '../assets/IMG4.jpg';
-
+import display_img1 from '../assets/display_img1.jpg';
+import display_img2 from '../assets/display_img2.jpg';
+import display_img3 from '../assets/display_img3.jpg';
+import display_img4 from '../assets/display_img4.jpg';
 // Export all assets
 export {
     image1,
@@ -49,5 +52,9 @@ export {
     splash,
     tenant,
     twoRoom,
-    img4
+    img4,
+    display_img1,
+    display_img2,
+    display_img3,
+    display_img4,
 };
