@@ -10,6 +10,7 @@ import { processBooking, cancelBooking, getBookingsByUserId  } from '../controll
 import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
 import { resetPassword } from '../controllers/userController.js';
+import { getLandlordIncomeByMonth } from '../controllers/processBooking.js';
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
@@ -19,6 +20,7 @@ router.post('/reset-password', resetPassword);
 router.get('/', getUsersByType);
 // Admin
 router.delete('/deny/:landlordId', denyLandlord);
+router.get('/landlords/income', getLandlordIncomeByMonth);
 // Route to toggle approval status
 router.put('/approve/:landlordId', toggleApprovalStatus);
 

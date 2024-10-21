@@ -49,6 +49,11 @@ export const processBooking = async (req, res) => {
       }
     }
 
+        // Calculate Admin Share (10% deduction) and Net Income for the landlord
+        const totalIncome = property.price;  // Assuming the property price is the booking price
+        const adminShare = totalIncome * 0.1;
+        const netIncome = totalIncome - adminShare;
+
     // Create the booking object
     const newBooking = {
       user: userId,
@@ -66,7 +71,9 @@ export const processBooking = async (req, res) => {
         senderName: paymentMethod === 'GCash' ? paymentDetails.senderName : null,
         receipt: paymentMethod === 'GCash' ? receipt : {}
       },
-      status: false
+      status: false,
+      adminShare,  // Store the admin's share of the income
+      netIncome
     };
 
     // Check if the property already has bookings
@@ -122,6 +129,11 @@ export const cancelBooking = async (req, res) => {
       canceledAt: new Date(),
       cancellationReason: cancellationReason,
     });
+      // Mark the booking as canceled and reset income fields
+      booking.status = false;  // Mark as canceled
+      booking.adminShare = 0;  // Reset admin share
+      booking.netIncome = 0;   // Reset net income
+  
 
     // Optionally: Change booking status (e.g., mark it as canceled)
     booking.status = false; // Mark as canceled
@@ -163,6 +175,8 @@ export const getBookingsByUserId = async (req, res) => {
       property.bookings.filter(booking => booking.user.toString() === userId).map(booking => ({
         ...booking.toObject(),
         propertyName: property.property.propertyName, 
+        adminShare: booking.adminShare,  // Include the admin share
+        netIncome: booking.netIncome,    // Include the net income
         price: property.property.price,
         paymentStatus: booking.status ? 'Paid' : 'Not Paid'
       }))
@@ -173,3 +187,54 @@ export const getBookingsByUserId = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+// Controller to get landlord income by month
+export const getLandlordIncomeByMonth = async (req, res) => {
+  const { month } = req.query; // Extract month from query params
+
+  try {
+    // Find all landlords
+    const landlords = await User.find({ accountType: 'landlord' });
+
+    if (!landlords || landlords.length === 0) {
+      return res.status(404).json({ message: 'No landlords found' });
+    }
+
+    // Initialize an array to store income data for each landlord
+    const landlordIncomeData = [];
+
+    // Loop through each landlord and calculate their income for the selected month
+    for (let landlord of landlords) {
+      // Find all bookings for this landlord's properties during the selected month
+      const bookedProperties = await BookedProperty.find({
+        'bookings.checkInDate': { $regex: month },
+        'property.userId': landlord._id // Assuming the property is linked to the landlord via userId
+      }).populate('property', 'price');
+
+      // Calculate total income for the landlord
+      let totalIncome = 0;
+
+      bookedProperties.forEach((bookedProperty) => {
+        bookedProperty.bookings.forEach((booking) => {
+          if (booking.status === true) { // Only count bookings that are paid
+            totalIncome += booking.netIncome; // Sum up the net income
+          }
+        });
+      });
+
+      // Store the calculated income data
+      landlordIncomeData.push({
+        landlordId: landlord._id,
+        landlordName: `${landlord.firstName} ${landlord.lastName}`,
+        totalIncome: totalIncome.toFixed(2) // Total income for this landlord
+      });
+    }
+
+    // Return the collected income data
+    res.status(200).json(landlordIncomeData);
+  } catch (error) {
+    console.error('Error fetching landlord income:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+

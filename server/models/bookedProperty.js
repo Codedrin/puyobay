@@ -91,10 +91,22 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean, 
     default: false, 
   },
+
   cancellations: [cancellationSchema], // Array of cancellation events
-}, {
+
+
+adminShare: {
+  type: Number,
+  default: 0,  // Store the admin's 10% share
+},
+netIncome: {
+  type: Number,
+  default: 0,  // Store the net income for the landlord after deduction
+},
+},{
   timestamps: true, 
 });
+
 
 // Define the schema for a property with multiple bookings and cancellation history
 const bookedPropertySchema = new mongoose.Schema({
@@ -108,6 +120,8 @@ const bookedPropertySchema = new mongoose.Schema({
   timestamps: true,
 });
 
+
 const BookedProperty = mongoose.model('BookedProperty', bookedPropertySchema);
 
 export default BookedProperty;
+

@@ -2,38 +2,36 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminPageNavbar from '../../../constants/AdminPageNavbar';
 
-const LandlordAdmin = () => {
-  const [landlords, setLandlords] = useState([]); // Initialize landlords state
-  const [totalTenants, setTotalTenants] = useState(0);
+const HousesAdmin = () => {
+  const [properties, setProperties] = useState([]); // State to store properties
   const [searchQuery, setSearchQuery] = useState(''); // State for search input
   const [entriesPerPage, setEntriesPerPage] = useState(5); // State for entries per page
   const [currentPage, setCurrentPage] = useState(1); // State for pagination
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchProperties = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
-        setLandlords(response.data.landlords); // Fetch landlords from the backend
-        setTotalTenants(response.data.totalTenants); // Fetch total tenants from the backend
+        const response = await axios.get('http://localhost:5000/api/users/get-properties'); // Fetch properties from your backend API
+        setProperties(response.data.properties); // Set properties to state
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching properties:', error);
       }
     };
 
-    fetchUsers();
+    fetchProperties();
   }, []);
 
   // Handle search filter
-  const filteredLandlords = landlords.filter((landlord) =>
-    landlord.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProperties = properties.filter((property) =>
+    property.propertyName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Handle pagination
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-  const currentLandlords = filteredLandlords.slice(indexOfFirstEntry, indexOfLastEntry);
+  const currentProperties = filteredProperties.slice(indexOfFirstEntry, indexOfLastEntry);
 
-  const totalPages = Math.ceil(filteredLandlords.length / entriesPerPage);
+  const totalPages = Math.ceil(filteredProperties.length / entriesPerPage);
 
   // Print function
   const handlePrint = () => {
@@ -45,7 +43,7 @@ const LandlordAdmin = () => {
       <AdminPageNavbar />
       <br />
 
-      {/* Entries, Search and Print button section */}
+      {/* Entries, Search, and Print button section */}
       <div className="flex justify-between items-center mb-4 mx-4">
         <div className="flex items-center">
           <label htmlFor="entries" className="mr-2">Show</label>
@@ -75,16 +73,16 @@ const LandlordAdmin = () => {
         </div>
 
         {/* Print Button */}
-        <button 
-          onClick={handlePrint} 
+        <button
+          onClick={handlePrint}
           className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
         >
           Print
         </button>
       </div>
 
-      {/* Landlords Section */}
-      <h2 className="text-lg md:text-xl font-semibold mb-4 mx-4">View All Landlords</h2>
+      {/* Properties Section */}
+      <h2 className="text-lg md:text-xl font-semibold mb-4 mx-4">View All Properties</h2>
 
       <div className="overflow-x-auto mx-4">
         <table className="min-w-full bg-white border border-gray-200">
@@ -92,32 +90,32 @@ const LandlordAdmin = () => {
             <tr>
               <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">ID</th>
               <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Name</th>
-              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Property Names</th>
-              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Address</th>
-              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Email</th>
-              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Total Tenants</th>
+              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Price</th>
+              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Rooms</th>
+              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Municipality</th>
+              <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Rating</th>
             </tr>
           </thead>
           <tbody>
-            {currentLandlords.map((landlord) => (
-              <tr key={landlord._id}>
+            {currentProperties.map((property) => (
+              <tr key={property._id}>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord._id}
+                  {property._id}
                 </td>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord.name}
+                  {property.propertyName}
                 </td>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord.propertyNames.join(', ')}
+                ₱ {property.price}
                 </td>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord.address}
+                  {property.availableRooms}
                 </td>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord.email}
+                  {property.municipality}
                 </td>
                 <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                  {landlord.totalTenants}
+                  {property.averageRating || 'N/A'}
                 </td>
               </tr>
             ))}
@@ -149,4 +147,4 @@ const LandlordAdmin = () => {
   );
 };
 
-export default LandlordAdmin;
+export default HousesAdmin;

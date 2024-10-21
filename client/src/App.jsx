@@ -18,6 +18,8 @@ import ManageUser from './views/pages/admin/ManageUser.jsx';
 import Settings from './views/pages/admin/Settings.jsx';
 import LandlordAdmin from './views/pages/admin/LandlordAdmin.jsx';
 import TenantAdmin from './views/pages/admin/TenantAdmin.jsx';
+import HousesAdmin from './views/pages/admin/HousesAdmin.jsx';
+import Reports from './views/pages/admin/Reports.jsx';
 //Landlord
 import LandlordPage from './views/pages/landlord/LandlordPage.jsx';
 import LandlordViewProfile from './views/pages/landlord/LandlordViewProfile.jsx';
@@ -50,11 +52,11 @@ const App = () => {
         <Route path="/admin" element={ <AdminLogin />} />
         <Route path="/admin-page" element= {<Admin />} />
         <Route path="/admin/manage-users" element={<ManageUser />} />
-        <Route path="/admin/settings" element={<AdminAuth> <Settings /> </AdminAuth>} />
+        <Route path="/admin/settings" element={ <Settings />} />
         <Route path="/admin/landlord" element={<LandlordAdmin /> }/>
         <Route path="/admin/tenant" element={<TenantAdmin /> }/>
-
-
+        <Route path="/admin/house" element={<HousesAdmin /> }/>
+        <Route path="/admin/reports" element={<Reports /> }/>
       {/* Landlord Page */}
       <Route path="/landlord" element={<ProtectedRoute> <LandlordPage /> </ProtectedRoute>} />
       <Route path="/landlord-profile" element={<ProtectedRoute> <LandlordViewProfile /> </ProtectedRoute>} />
