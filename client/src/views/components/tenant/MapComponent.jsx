@@ -83,53 +83,53 @@ const MapComponent = () => {
 
   return (
     <div className="flex flex-col items-center p-4">
-      {/* Search Input */}
-      <div className="my-4 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Minimal Search Bar */}
+      <div className="my-4 w-full flex flex-wrap justify-center space-x-2">
         <input
           type="text"
-          className="border px-3 py-2 rounded w-full"
-          placeholder="Search for a boarding house..."
+          className="border px-2 py-1 rounded text-sm w-48"
+          placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <input
           type="number"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-2 py-1 rounded text-sm w-24"
           placeholder="Min Price"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
         />
         <input
           type="number"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-2 py-1 rounded text-sm w-24"
           placeholder="Max Price"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
         />
         <input
           type="number"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-2 py-1 rounded text-sm w-24"
           placeholder="Rooms"
           value={rooms}
           onChange={(e) => setRooms(e.target.value)}
         />
         <input
           type="number"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-2 py-1 rounded text-sm w-24"
           placeholder="Rating"
           value={rating}
           onChange={(e) => setRating(e.target.value)}
         />
         <input
           type="text"
-          className="border px-3 py-2 rounded w-full"
+          className="border px-2 py-1 rounded text-sm w-48"
           placeholder="Municipality"
           value={municipality}
           onChange={(e) => setMunicipality(e.target.value)}
         />
         <button
           onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded w-full sm:col-span-2"
+          className="bg-blue-500 text-white px-4 py-2 rounded text-sm"
         >
           Search
         </button>
