@@ -35,7 +35,7 @@ const MapComponent = () => {
   // Fetch properties with latitude and longitude from the API
   const fetchProperties = async (queryParams = '') => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/get-properties${queryParams}`);
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-properties${queryParams}`);
       const data = await response.json();
       setProperties(data);
     } catch (error) {
