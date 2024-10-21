@@ -47,7 +47,7 @@ const MapComponent = () => {
     fetchProperties(); // Fetch all properties on initial load
   }, []);
 
-  // Handle search
+  // Handle search and zoom into a property
   const handleSearch = () => {
     // Build query string based on search criteria
     const queryParams = new URLSearchParams({
@@ -60,7 +60,13 @@ const MapComponent = () => {
     }).toString();
 
     // Fetch filtered properties from the backend
-    fetchProperties(`?${queryParams}`);
+    fetchProperties(`?${queryParams}`).then(() => {
+      // Find the first property that matches the search criteria and zoom into it
+      const matchingProperty = properties.find((property) => property.propertyName.toLowerCase().includes(searchQuery.toLowerCase()));
+      if (matchingProperty) {
+        setMapCenter([matchingProperty.lat, matchingProperty.lang]); // Zoom to the matched property
+      }
+    });
   };
 
   // Handle Book Now navigation
@@ -84,7 +90,7 @@ const MapComponent = () => {
   return (
     <div className="flex flex-col items-center p-4">
       {/* Minimal Search Bar */}
-      <div className="my-4 w-full flex flex-wrap justify-center space-x-2">
+      <div className="my-4 w-full flex flex-wrap justify-center space-x-2 space-y-2 sm:space-y-0">
         <input
           type="text"
           className="border px-2 py-1 rounded text-sm w-48"
