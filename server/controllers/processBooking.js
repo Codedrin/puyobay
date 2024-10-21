@@ -190,9 +190,15 @@ export const getBookingsByUserId = async (req, res) => {
 
 // Controller to get landlord income by month
 export const getLandlordIncomeByMonth = async (req, res) => {
-  const { month } = req.query; // Extract month from query params
+  const { month } = req.query; // Extract month from query params (e.g., '2024-10')
 
   try {
+    // Parse the month into a Date range
+    const startOfMonth = new Date(`${month}-01`); // Start of the selected month
+    const endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth() + 1, 0); // End of the month
+
+    console.log('Date range:', startOfMonth, 'to', endOfMonth); // Log for debugging
+
     // Find all landlords
     const landlords = await User.find({ accountType: 'landlord' });
 
@@ -205,36 +211,62 @@ export const getLandlordIncomeByMonth = async (req, res) => {
 
     // Loop through each landlord and calculate their income for the selected month
     for (let landlord of landlords) {
-      // Find all bookings for this landlord's properties during the selected month
+      // Find all properties belonging to this landlord that have bookings during the selected month
       const bookedProperties = await BookedProperty.find({
-        'bookings.checkInDate': { $regex: month },
-        'property.userId': landlord._id // Assuming the property is linked to the landlord via userId
-      }).populate('property', 'price');
-
-      // Calculate total income for the landlord
-      let totalIncome = 0;
-
-      bookedProperties.forEach((bookedProperty) => {
-        bookedProperty.bookings.forEach((booking) => {
-          if (booking.status === true) { // Only count bookings that are paid
-            totalIncome += booking.netIncome; // Sum up the net income
-          }
-        });
+        'bookings.checkInDate': { $gte: startOfMonth, $lte: endOfMonth },
+        'property.userId': landlord._id
+      }).populate({
+        path: 'property',
+        select: 'propertyName price' // Populate propertyName and price fields
       });
 
-      // Store the calculated income data
+      if (!bookedProperties || bookedProperties.length === 0) {
+        // If no bookings found, add 0 income data for this landlord
+        landlordIncomeData.push({
+          landlordId: landlord._id,
+          landlordName: `${landlord.firstName} ${landlord.lastName}`,
+          totalIncome: "0.00",
+          deduction: "0.00",
+          netIncome: "0.00"
+        });
+        continue; // Move to the next landlord
+      }
+
+      // Collect all successful bookings for this month
+      const landlordBookings = bookedProperties.flatMap(property =>
+        property.bookings
+          .filter(booking => booking.checkInDate >= startOfMonth && booking.checkInDate <= endOfMonth && booking.status === true)
+          .map(booking => ({
+            adminShare: booking.adminShare,
+            netIncome: booking.netIncome
+          }))
+      );
+
+      // Calculate total income, deduction, and net income for the landlord
+      let totalIncome = 0;
+      let deduction = 0;
+      let netIncome = 0;
+
+      landlordBookings.forEach(booking => {
+        totalIncome += booking.adminShare + booking.netIncome;
+        deduction += booking.adminShare;
+        netIncome += booking.netIncome;
+      });
+
+      // Store the calculated income data for each landlord
       landlordIncomeData.push({
         landlordId: landlord._id,
         landlordName: `${landlord.firstName} ${landlord.lastName}`,
-        totalIncome: totalIncome.toFixed(2) // Total income for this landlord
+        totalIncome: totalIncome.toFixed(2),
+        deduction: deduction.toFixed(2),
+        netIncome: netIncome.toFixed(2)
       });
     }
 
-    // Return the collected income data
+    // Return the income data to the frontend
     res.status(200).json(landlordIncomeData);
   } catch (error) {
     console.error('Error fetching landlord income:', error);
     res.status(500).json({ message: 'Server error', error });
   }
 };
-
