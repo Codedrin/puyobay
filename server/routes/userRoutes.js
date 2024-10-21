@@ -4,7 +4,7 @@ import { registerUser, loginUser, forgotPassword, getUsersByType, toggleApproval
 import { getUserProfileById, updateUserProfile } from '../controllers/LandlordProfileController.js';
 import { addProperty, getPropertiesByUser, getPropertyById, updateProperty, deleteProperty } from '../controllers/landlordAddProperty.js';
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
-import { getAllProperties } from '../controllers/getAllproperties.js';
+import { getAllProperties, getPropertyCount } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
 import { processBooking, cancelBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
 import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
@@ -21,6 +21,7 @@ router.get('/', getUsersByType);
 // Admin
 router.delete('/deny/:landlordId', denyLandlord);
 router.get('/landlords/income', getLandlordIncomeByMonth);
+router.get('/get-property-count', getPropertyCount)
 // Route to toggle approval status
 router.put('/approve/:landlordId', toggleApprovalStatus);
 

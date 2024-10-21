@@ -15,7 +15,7 @@ export const processBooking = async (req, res) => {
     checkInDate,
     checkOutDate,
     persons,
-    paymentMethod,
+    paymentMethod,    
     paymentDetails // Payment details, including receipt data, will come from req.body
   } = req.body;
 
