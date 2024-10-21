@@ -18,7 +18,7 @@ const Reports = () => {
 
   const fetchLandlordIncome = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/landlords/income?month=${selectedMonth}`); // Fetch income based on month
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/users/landlords/income?month=${selectedMonth}`); // Fetch income based on month
       setLandlords(response.data); // Set the response data to state
     } catch (error) {
       console.error('Error fetching landlords\' income:', error);

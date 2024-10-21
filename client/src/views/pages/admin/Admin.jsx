@@ -28,7 +28,7 @@ const Admin = () => {
 
     const fetchProperties = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/get-properties');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-properties`);
         setTotalHouses(response.data.totalProperties); // Fetch total houses (properties)
       } catch (error) {
         console.error('Error fetching properties:', error);
