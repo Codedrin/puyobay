@@ -87,7 +87,7 @@ const Admin = () => {
               <div>
                 <h3 className="text-lg font-semibold">Reports</h3>
                 {/* Handle totalPayments being undefined or null */}
-                <p className="text-2xl">{totalPayments !== null && totalPayments !== undefined ? totalPayments.toFixed(2) : '0.00'}</p>
+                {/* <p className="text-2xl">{totalPayments !== null && totalPayments !== undefined ? totalPayments.toFixed(2) : ''}</p> */}
               </div>
             </div>
             <a href="/admin/reports" className="text-white underline">View Payments</a>
