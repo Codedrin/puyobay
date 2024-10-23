@@ -112,7 +112,7 @@ const Reports = () => {
                 <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Landlord ID</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Landlord Name</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Total Income (₱)</th>
-                <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Deduction (10%)</th>
+                <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Deduction (3%)</th>
                 <th className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">Net Income (₱)</th>
               </tr>
             </thead>
@@ -129,7 +129,7 @@ const Reports = () => {
                     ₱{parseFloat(landlord.totalIncome).toLocaleString('en-PH')}
                   </td>
                   <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
-                    ₱{(parseFloat(landlord.totalIncome) * 0.1).toLocaleString('en-PH')} {/* 10% deduction */}
+                    ₱{(parseFloat(landlord.totalIncome) * 0.03).toLocaleString('en-PH')} {/* 10% deduction */}
                   </td>
                   <td className="py-2 px-2 md:px-4 border-b text-left text-xs md:text-sm">
                     ₱{calculateNetIncome(parseFloat(landlord.totalIncome)).toLocaleString('en-PH')}

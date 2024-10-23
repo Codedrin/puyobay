@@ -105,15 +105,15 @@ const BookingForm = () => {
         if (!validatePaymentDetails()) {
             return;
         }
-
+    
         try {
             setIsSubmitting(true);
-
+    
             let receiptData = {};
             if (formData.paymentMethod === 'GCash' && paymentDetails.receipt) {
                 receiptData = await uploadFileToCloudinary(paymentDetails.receipt);
             }
-
+    
             const bookingData = {
                 ...formData,
                 userId,
@@ -129,7 +129,7 @@ const BookingForm = () => {
             const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/process-booking`, bookingData);
 
             if (response.status === 201) {
-                toast.success('Booking processed successfully Pleased Wait for the confirmation Email.');
+                toast.success('Booking processed successfully. Please wait for the confirmation email.');
             } else {
                 toast.error('Failed to process booking');
             }
@@ -141,6 +141,7 @@ const BookingForm = () => {
             setIsConfirmationModalOpen(false);
         }
     };
+    
 
     return (
         <div>

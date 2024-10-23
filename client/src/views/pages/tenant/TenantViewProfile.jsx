@@ -96,6 +96,7 @@ const TenantViewProfile = () => {
     }
   };
   
+  
   const closeCancelModal = () => {
     setIsCancelModalOpen(false);
     setCancellationReason('');
