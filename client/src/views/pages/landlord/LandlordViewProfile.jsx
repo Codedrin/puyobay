@@ -349,8 +349,6 @@ const LandlordViewProfile = () => {
       )}
       
 
-      <BookingAndProperty />
-
     </div>
   );
 };
