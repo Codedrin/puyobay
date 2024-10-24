@@ -48,7 +48,7 @@ const Reports = () => {
 
   // Function to calculate the net income after a 10% deduction
   const calculateNetIncome = (income) => {
-    const deduction = income * 0.1; // 10% deduction
+    const deduction = income * 0.03; // 3% deduction
     return income - deduction;
   };
 
