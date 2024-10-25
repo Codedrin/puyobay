@@ -77,11 +77,17 @@ const TenantFooterProperty = () => {
                   {renderStars(property.averageRating || 0)}
                 </div>
                 <p className="mt-2">{property.description}</p>
-                <p><strong>Available Rooms:</strong> {property.availableRooms}</p> 
+                <p>
+              <strong>Available Rooms:</strong> {property.availableRooms > 0 ? property.availableRooms : 'No available rooms'}
+            </p>
                 <p><strong>Price:</strong> ₱{property.price}</p> 
                 <p><strong>Area:</strong> {property.area} sq ft</p>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-                 onClick={() => handleBook(property._id)}>
+                <button 
+                  className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 
+                              ${property.availableRooms === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+                  onClick={() => handleBook(property._id)}
+                  disabled={property.availableRooms === 0}
+                >
                    View
                  </button>
               </div>
