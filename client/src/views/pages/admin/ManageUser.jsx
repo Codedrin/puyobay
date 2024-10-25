@@ -13,8 +13,7 @@ const ManageUser = () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
         const { landlords, tenants } = response.data;
-  
-        // Update the state with the fetched users
+    
         setLandlords(landlords);
         setTenants(tenants);
       } catch (error) {
@@ -22,7 +21,7 @@ const ManageUser = () => {
         toast.error('Error fetching users');
       }
     };
-  
+    
     // Fetch the latest users when the component loads
     fetchUsers();
   }, []); // <-- Ensure fetchUsers runs only when the component loads
@@ -105,12 +104,13 @@ const ManageUser = () => {
                   <td className="py-2 px-2 md:px-4 border text-center">{landlord.name}</td>
                   <td className="py-2 px-2 md:px-4 border text-center">{landlord.email}</td>
                   <td className="py-2 px-2 md:px-4 border text-center">
-                    <button
-                        className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600"
-                        onClick={() => handleViewCertificate(landlord.attachment?.url)}
+                  <button
+                      className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600"
+                      onClick={() => handleViewCertificate(landlord.attachment?.url)}
                     >
-                        {landlord.attachment?.url ? 'Check Certificate' : 'No Certificate'}
+                      {landlord.attachment?.url ? 'Check Certificate' : 'No Certificate'}
                     </button>
+
                     </td>
 
                     <td className="py-2 px-2 md:px-4 border text-center">
