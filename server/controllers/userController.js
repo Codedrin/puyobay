@@ -287,24 +287,26 @@ export const getUsersByType = async (req, res) => {
 
     // Map through landlords and get their property names and tenant counts
     const landlords = users
-      .filter(user => user.accountType === 'landlord')
-      .map(landlord => {
-        const properties = landlordProperties[landlord._id] || [];
-        const totalTenants = properties.reduce(
-          (sum, property) => sum + (propertyTenantCount[property.propertyId] || 0),
-          0
-        );
-
-        return {
-          _id: landlord._id,
-          name: `${landlord.firstName} ${landlord.lastName}`,
-          email: landlord.email,
-          address: landlord.address,
-          propertyNames: properties.map(prop => prop.propertyName), 
-          totalTenants, 
-          approved: landlord.approved, 
-        };
-      });
+    .filter(user => user.accountType === 'landlord')
+    .map(landlord => {
+      const properties = landlordProperties[landlord._id] || [];
+      const totalTenants = properties.reduce(
+        (sum, property) => sum + (propertyTenantCount[property.propertyId] || 0),
+        0
+      );
+  
+      return {
+        _id: landlord._id,
+        name: `${landlord.firstName} ${landlord.lastName}`,
+        email: landlord.email,
+        address: landlord.address,
+        propertyNames: properties.map(prop => prop.propertyName),
+        totalTenants,
+        approved: landlord.approved,
+        attachment: landlord.landlordDetails?.attachment || null, // Accessing the attachment from landlordDetails
+      };
+    });
+  
 
     // Count total landlords
     const totalLandlords = landlords.length;
