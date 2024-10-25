@@ -22,46 +22,32 @@ const BookProperty = () => {
 
   const user = getUserFromLocalStorage();
 
-    useEffect(() => {
-        // Fetch property details
-        const fetchPropertyDetails = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-propertiesId/${propertyId}`);
-            const data = await response.json();
-            setProperty(data);
-        } catch (error) {
-            console.error('Error fetching property details:', error);
-        }
-        };
+  useEffect(() => {
+    // Fetch property details
+    const fetchPropertyDetails = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-propertiesId/${propertyId}`);
+        const data = await response.json();
+        setProperty(data);
+      } catch (error) {
+        console.error('Error fetching property details:', error);
+      }
+    };
 
-        // Fetch other properties for the carousel
-        const fetchOtherProperties = async () => {
-        try {
-            const response = await fetch('http://:5000/api/users/get-properties');
-            const data = await response.json();
-            // Select only 5 properties to display in the carousel
-            setOtherProperties(data.slice(0, 5));
-        } catch (error) {
-            console.error('Error fetching other properties:', error);
-        }
-        };
+    // Fetch other properties for the carousel
+    const fetchOtherProperties = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-properties`);
+        const data = await response.json();
+        setOtherProperties(data.slice(0, 5)); // Limit to 5 properties
+      } catch (error) {
+        console.error('Error fetching other properties:', error);
+      }
+    };
 
-        // Fetch other properties along with their average ratings
-        const fetchOtherPropertiesWithRatings = async () => {
-            try {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-average-ratings`); // Use the correct endpoint
-            const data = await response.json();
-            setOtherProperties(data.slice(0, 5)); // Store properties with ratings
-            } catch (error) {
-            console.error('Error fetching properties with ratings:', error);
-            }
-        };
-
-  
-        fetchPropertyDetails();
-        fetchOtherProperties();
-        fetchOtherPropertiesWithRatings();
-    }, [propertyId]);
+    fetchPropertyDetails();
+    fetchOtherProperties();
+  }, [propertyId]);
 
   const submitRating = async () => {
     if (!user) {
@@ -69,14 +55,14 @@ const BookProperty = () => {
       return;
     }
 
-        try {
-        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/submitrating/${propertyId}/rate`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ rating, userId: user.id }),
-        });
+    try {
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/submitrating/${propertyId}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating, userId: user.id }),
+      });
 
       const data = await response.json();
       if (response.ok) {
