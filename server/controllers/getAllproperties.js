@@ -3,7 +3,7 @@ import Property from "../models/addNewProperty.js";
 
 // Get all properties or search properties based on filters
 export const getAllProperties = async (req, res) => {
-  const { searchQuery, minPrice, maxPrice, rooms, rating, municipality, userId } = req.query;
+  const { searchQuery, minPrice, maxPrice, rooms, rating, selectArea, userId } = req.query;
 
   try {
     // Build the query object dynamically
@@ -21,9 +21,9 @@ export const getAllProperties = async (req, res) => {
       if (maxPrice) query.price.$lte = parseFloat(maxPrice); // Less than or equal to maxPrice
     }
 
-    // Filter by available rooms
+    // Filter by available rooms (greater than or equal to provided number of rooms)
     if (rooms) {
-      query.availableRooms = parseInt(rooms, 10);
+      query.availableRooms = { $gte: parseInt(rooms, 10) };
     }
 
     // Filter by rating (greater than or equal to the provided rating)
@@ -31,9 +31,9 @@ export const getAllProperties = async (req, res) => {
       query.averageRating = { $gte: parseFloat(rating) };
     }
 
-    // Filter by municipality
-    if (municipality) {
-      query.municipality = municipality; // Exact match (can adjust to case-insensitive if needed)
+    // Filter by selected area
+    if (selectArea) {
+      query.selectArea = selectArea; // Filtering by selected area
     }
 
     // Filter by userId
@@ -44,13 +44,14 @@ export const getAllProperties = async (req, res) => {
     // Find properties based on query object
     const properties = await Property.find(query);
 
-    // Return filtered properties
+    // Send the filtered properties to the client
     res.status(200).json(properties);
   } catch (error) {
     console.error("Error fetching properties:", error);
     res.status(500).json({ message: "Error fetching properties", error });
   }
 };
+
 
 
 export const getPropertyCount = async (req, res) => {

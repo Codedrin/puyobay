@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { useParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom'; 
@@ -186,7 +186,9 @@ const BookProperty = () => {
           </div>
 
           <div className="md:w-1/2">
-            <p><strong>Available Rooms:</strong> {property.availableRooms}</p>
+            <p>
+              <strong>Available Rooms:</strong> {property.availableRooms > 0 ? property.availableRooms : 'No available rooms'}
+            </p>
             <p><strong>Price:</strong> ₱{property.price}</p>
             <p><strong>Details:</strong> {property.description}</p>
             <p><strong>Area:</strong> {property.area} sq ft</p>
@@ -200,13 +202,20 @@ const BookProperty = () => {
                 Back
               </button>
 
-              <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleBookingForm}>
+              <button
+                className={`px-4 py-2 rounded text-white 
+                ${property.availableRooms === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+                onClick={handleBookingForm}
+                disabled={property.availableRooms === 0}
+              >
                 Book Now
               </button>
+
             </div>
           </div>
         </div>
 
+        {/* Rating and Other Properties Section */}
         <div className="mt-8">
           <h3 className="text-2xl font-bold">Rate this property:</h3>
           <div className="flex gap-2">
@@ -228,6 +237,7 @@ const BookProperty = () => {
           </button>
         </div>
 
+        {/* Other properties carousel */}
         <div className="mt-10">
           <h3 className="text-2xl font-bold mb-4">Other Properties You May Like</h3>
           <Slider {...otherPropertySettings}>
@@ -258,8 +268,8 @@ const BookProperty = () => {
         <br />
 
         {/* Footer Section */}
-        <div className="text-center mt-10">
-          <p className="text-gray-600">&copy; 2024 PUYOBAY. All rights reserved.</p>
+        <div className="py-6 text-center">
+          <p className="text-gray-600">All rights reserved.</p>
         </div>
       </div>
     </>
