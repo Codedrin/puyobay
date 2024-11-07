@@ -18,6 +18,7 @@ router.post('/login', loginUser );
 router.post('/forgot', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/', getUsersByType);
+
 // Admin
 router.delete('/deny/:landlordId', denyLandlord);
 router.get('/landlords/income', getLandlordIncomeByMonth);

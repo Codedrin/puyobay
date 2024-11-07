@@ -14,7 +14,7 @@ const AdminNavbar = () => {
         {/* Navigation Links */}
         <div className="flex space-x-4">
           <NavLink
-            to="/"
+            to="/signin"
             className={({ isActive }) =>
               isActive
                 ? "bg-blue-600 text-white font-semibold px-3 py-2 rounded-lg"

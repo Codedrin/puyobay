@@ -27,7 +27,7 @@ const LandlordNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear the user from localStorage
-    navigate('/'); // Redirect to the login page
+    navigate('/signin'); // Redirect to the login page
   };
 
   const profileImageUrl = profile?.profilePicture?.url || 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; // Default image if no profile picture
