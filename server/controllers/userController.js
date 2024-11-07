@@ -250,19 +250,15 @@ export const resetPassword = async (req, res) => {
 // Get all users
 export const getUsersByType = async (req, res) => {
   try {
-    // Fetch all users
     const users = await User.find();
 
-    // Fetch all properties and their related landlords
     const properties = await Property.find().populate('userId', 'firstName lastName');
 
-    // Fetch booked properties (including the property details)
     const bookedProperties = await BookedProperty.find().populate({
       path: 'property', // Populate the property details
       select: 'propertyName', // Select only the property name
     });
 
-    // Create a mapping of landlordId to their properties
     const landlordProperties = properties.reduce((acc, property) => {
       if (property.userId && property.userId._id) { // Add null check for userId
         if (!acc[property.userId._id]) {
@@ -276,42 +272,37 @@ export const getUsersByType = async (req, res) => {
       return acc;
     }, {});
 
-    // Create a mapping of propertyId to total unique tenants (userId)
     const propertyTenantCount = bookedProperties.reduce((acc, bookedProperty) => {
-      // Use a Set to track unique userIds for each property
-      const uniqueTenantIds = new Set(bookedProperty.bookings.map(booking => booking.user.toString()));
-
-      acc[bookedProperty.property._id] = uniqueTenantIds.size; // Count unique tenants
+      if (bookedProperty.property && bookedProperty.property._id) { // Add null check for bookedProperty.property
+        const uniqueTenantIds = new Set(bookedProperty.bookings.map(booking => booking.user.toString()));
+        acc[bookedProperty.property._id] = uniqueTenantIds.size; // Count unique tenants
+      }
       return acc;
     }, {});
 
-    // Map through landlords and get their property names and tenant counts
     const landlords = users
-    .filter(user => user.accountType === 'landlord')
-    .map(landlord => {
-      const properties = landlordProperties[landlord._id] || [];
-      const totalTenants = properties.reduce(
-        (sum, property) => sum + (propertyTenantCount[property.propertyId] || 0),
-        0
-      );
-  
-      return {
-        _id: landlord._id,
-        name: `${landlord.firstName} ${landlord.lastName}`,
-        email: landlord.email,
-        address: landlord.address,
-        propertyNames: properties.map(prop => prop.propertyName),
-        totalTenants,
-        approved: landlord.approved,
-        attachment: landlord.landlordDetails?.attachment || null, // Accessing the attachment from landlordDetails
-      };
-    });
-  
+      .filter(user => user.accountType === 'landlord')
+      .map(landlord => {
+        const properties = landlordProperties[landlord._id] || [];
+        const totalTenants = properties.reduce(
+          (sum, property) => sum + (propertyTenantCount[property.propertyId] || 0),
+          0
+        );
 
-    // Count total landlords
+        return {
+          _id: landlord._id,
+          name: `${landlord.firstName} ${landlord.lastName}`,
+          email: landlord.email,
+          address: landlord.address,
+          propertyNames: properties.map(prop => prop.propertyName),
+          totalTenants,
+          approved: landlord.approved,
+          attachment: landlord.landlordDetails?.attachment || null,
+        };
+      });
+
     const totalLandlords = landlords.length;
 
-    // Map through tenants (no additional logic needed for tenants in this case)
     const tenants = users
       .filter(user => user.accountType === 'tenant')
       .map(tenant => ({
@@ -321,10 +312,8 @@ export const getUsersByType = async (req, res) => {
         address: tenant.address,
       }));
 
-    // Count total tenants
     const totalTenants = tenants.length;
 
-    // Send the response including total counts
     res.status(200).json({ 
       landlords, 
       tenants, 
@@ -332,9 +321,12 @@ export const getUsersByType = async (req, res) => {
       totalTenants 
     });
   } catch (error) {
+    console.error('Error in getUsersByType:', error);
     res.status(500).json({ message: 'Error fetching users', error: error.message });
   }
 };
+
+
 
 
 // Approve a landlord
