@@ -11,7 +11,7 @@ const HousesAdmin = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-property-count`); // Fetch properties from your backend API
+        const response = await axios.get(`http://localhost:5000/api/users/get-property-count`); // Fetch properties from your backend API
         setProperties(response.data.properties); // Set properties to state
       } catch (error) {
         console.error('Error fetching properties:', error);

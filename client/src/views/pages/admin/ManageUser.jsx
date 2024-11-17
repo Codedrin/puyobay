@@ -11,7 +11,7 @@ const ManageUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users`);
+        const response = await axios.get(`http://localhost:5000/api/users`);
         const { landlords, tenants } = response.data;
 
         setLandlords(landlords);
@@ -27,7 +27,7 @@ const ManageUser = () => {
   const handleToggleApproval = async (landlordId, currentStatus) => {
     try {
       // Send a PUT request to toggle the approval status in the backend
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/approve/${landlordId}`, { approved: !currentStatus });
+      const response = await axios.put(`http://localhost:5000/api/users/approve/${landlordId}`, { approved: !currentStatus });
     
       const updatedLandlord = response.data.landlord;
   
@@ -45,7 +45,7 @@ const ManageUser = () => {
 
   const handleDeny = async (landlordId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/deny/${landlordId}`);
+      await axios.delete(`http://localhost:5000/api/users/deny/${landlordId}`);
       toast.success('Landlord denied and removed successfully');
       
       setLandlords((prevLandlords) =>
