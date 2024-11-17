@@ -42,12 +42,6 @@ const Login = () => {
           email,
           password,
           accountType,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          },
         }
       );
 
