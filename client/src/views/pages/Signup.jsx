@@ -73,7 +73,14 @@
     const handleRegularSignUp = async () => {
       try {
         setLoading(true); 
-        const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
+        const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, 
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          },
+          {
           ...formData,
           attachment: null,
         });
@@ -96,7 +103,14 @@
           attachmentUrl = await uploadFileToCloudinary(attachment);
         }
   
-        const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
+        const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, 
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          },
+          {
           ...formData,
           attachment: attachmentUrl,
         });
