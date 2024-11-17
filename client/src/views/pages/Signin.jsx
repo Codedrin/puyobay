@@ -19,28 +19,29 @@ const Login = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
-      setStoredUser(storedUser);  // Access the user object from storage
+      setStoredUser(storedUser); // Retrieve user object from storage
     }
   }, []);
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     try {
       setLoading(true);
-  
+
       if (!accountType) {
         toast.error("Please select an account type.");
         setLoading(false);
         return;
       }
-  
+
       // Send login request with email, password, and accountType
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`, 
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`,
         {
           email,
           password,
-          accountType
+          accountType,
         },
         {
           headers: {
@@ -58,16 +59,19 @@ const Login = () => {
         localStorage.removeItem('rememberMe');
         localStorage.removeItem('userPassword');
       }
-  
+
       // Store user and token in localStorage
       const { accessToken, redirectURL } = response.data;
-      localStorage.setItem('user', JSON.stringify({
-        accessToken: accessToken,
-        email,
-        accountType,
-        id: response.data.id,
-      }));
-  
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          accessToken,
+          email,
+          accountType,
+          id: response.data.id,
+        })
+      );
+
       // Redirect to appropriate page
       window.location.href = redirectURL;
     } catch (error) {
@@ -81,7 +85,7 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
+
   
   return (
     <div>
