@@ -42,7 +42,7 @@ const OTP = () => {
       setCanResend(false);
 
       // Resend OTP via API call
-      await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/resend-otp/${userId}`);
+      await axios.post(`http://localhost:5000/api/users/resend-otp/${userId}`);
     } catch (error) {
       console.error('Error resending OTP:', error);
     }
@@ -51,7 +51,7 @@ const OTP = () => {
   const handleSubmit = async () => {
     const otpValue = otp.join("");
     try {
-      const response = await axios.post('${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/verify-otp', { otp: otpValue, userId });
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/verify-otp`, { otp: otpValue, userId });
       
       if (response.data.success) {
 
