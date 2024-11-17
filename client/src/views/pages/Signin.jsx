@@ -39,6 +39,12 @@ const Login = () => {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`,
         {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      },
+        {
           email,
           password,
           accountType,
