@@ -13,7 +13,7 @@ const LandlordNavbar = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/${userId}`);
+        const { data } = await axios.get(`https://puyobay-server.vercel.app/api/users/profile/${userId}`);
         setProfile(data); // Set the fetched profile data
       } catch (error) {
         console.error('Error fetching profile:', error);

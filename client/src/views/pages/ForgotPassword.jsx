@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/forgot`, { email });
+      const response = await axios.post('https://puyobay-server.vercel.app/api/users/forgot', { email });
       setMessage(response.data.message);
       setLoading(false);
       

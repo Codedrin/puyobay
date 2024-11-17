@@ -40,7 +40,7 @@ const BookingForm = () => {
     useEffect(() => {
         const fetchProperty = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/property/${propertyId}`);
+                const response = await axios.get(`https://puyobay-server.vercel.app/api/users/property/${propertyId}`);
                 setProperty(response.data);
             } catch (error) {
                 console.error('Error fetching property:', error);
@@ -126,7 +126,7 @@ const BookingForm = () => {
                 },
             };
 
-            const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/process-booking`, bookingData);
+            const response = await axios.post('https://puyobay-server.vercel.app/api/users/process-booking', bookingData);
 
             if (response.status === 201) {
                 toast.success('Booking processed successfully. Please wait for the confirmation email.');

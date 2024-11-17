@@ -77,7 +77,7 @@ const UpdateLandlordProperty = () => {
       };
 
       // Send update request
-      const response = await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/update-property/${id}`, updatedData);
+      const response = await axios.put(`https://puyobay-server.vercel.app/api/users/update-property/${id}`, updatedData);
       console.log('Property updated:', response.data);
       setIsLoading(false); // Hide loading spinner
       alert('Property updated successfully!');

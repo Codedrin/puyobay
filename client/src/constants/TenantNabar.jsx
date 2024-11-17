@@ -19,7 +19,7 @@ const TenantNavbar = () => {
     // Fetch profile data
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/profile/${userId}`);
+        const response = await axios.get(`https://puyobay-server.vercel.app/api/users/profile/${userId}`);
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
