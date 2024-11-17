@@ -9,7 +9,16 @@ const app = express();
 dotenv.config();
 dbcon();
 
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: ['https://puyobay.vercel.app'], // Frontend URL
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // Allow credentials (cookies, authorization headers)
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Use user routes
