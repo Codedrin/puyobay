@@ -37,7 +37,7 @@ const BookProperty = () => {
     // Fetch other properties for the carousel
     const fetchOtherProperties = async () => {
       try {
-        const response = await fetch('https://puyobay-server.vercel.app/api/users/get-properties');
+        const response = await fetch('${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}api/users/get-properties');
         const data = await response.json();
         setOtherProperties(data.slice(0, 5)); // Limit to 5 properties
       } catch (error) {
