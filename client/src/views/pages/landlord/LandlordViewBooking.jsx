@@ -19,7 +19,7 @@ const LandlordViewBooking = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`https://puyobay-server.vercel.app/api/users/bookings/landlord/${landlordId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/bookings/landlord/${landlordId}`);
         const bookings = response.data.bookings;
 
         // Separate bookings into pending and confirmed based on the boolean status
@@ -42,7 +42,7 @@ const LandlordViewBooking = () => {
   const handleUpdateStatus = async (bookingId, status, tenantEmail, tenantName) => {
     try {
       // Send 'Confirmed' or 'Rejected' as status strings to the backend
-      await axios.put(`https://puyobay-server.vercel.app/api/users/bookings/status/${bookingId}`, { status, tenantEmail, tenantName });
+      await axios.put(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/bookings/status/${bookingId}`, { status, tenantEmail, tenantName });
       toast.success(`Booking ${status === 'Confirmed' ? 'approved' : 'rejected'} successfully!`);
 
       // Update the booking state locally after status change

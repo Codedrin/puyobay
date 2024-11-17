@@ -26,7 +26,7 @@ const LandlordDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(`https://puyobay-server.vercel.app/api/users/landlord-dashboard/${landlordId}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/landlord-dashboard/${landlordId}`);
         setDashboardData(response.data);
         setLoading(false);
       } catch (error) {
