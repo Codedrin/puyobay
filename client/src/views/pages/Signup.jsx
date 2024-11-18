@@ -79,6 +79,12 @@ const Signup = () => {
       const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
         ...formData,
         attachment: null,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*', 
+        },
       });
       
       const userId = response.data.user.id;
@@ -99,10 +105,19 @@ const Signup = () => {
         attachmentUrl = await uploadFileToCloudinary(attachment);
       }
 
-      const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, {
-        ...formData,
-        attachment: attachmentUrl,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`,
+        {
+          ...formData,
+          attachment: attachmentUrl,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*', 
+          },
+        }
+      );
       localStorage.setItem('user', JSON.stringify(response.data.user)); 
       const userId = response.data.user.id;
       navigate(`/otp/${userId}`);
