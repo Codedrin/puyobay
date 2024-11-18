@@ -10,14 +10,15 @@ dotenv.config();
 dbcon();
 
 
-// CORS configuration
-const corsOptions = {
-  origin: ['https://puyobay.vercel.app'], // Frontend URL
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, // Allow credentials (cookies, authorization headers)
-};
+// // CORS configuration
+// const corsOptions = {
+//   origin: ['https://puyobay.vercel.app'], // Frontend URL
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   credentials: true, // Allow credentials (cookies, authorization headers)
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 

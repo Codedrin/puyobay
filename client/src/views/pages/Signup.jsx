@@ -75,12 +75,6 @@
         setLoading(true); 
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, 
           {
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-            },
-          },
-          {
           ...formData,
           attachment: null,
         });
@@ -104,12 +98,6 @@
         }
   
         const response =  await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/register`, 
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-            },
-          },
           {
           ...formData,
           attachment: attachmentUrl,
