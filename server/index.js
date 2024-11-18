@@ -7,9 +7,20 @@ import userRoutes from './routes/userRoutes.js';
 const app = express();
 
 dotenv.config();
+
 dbcon();
 
-app.use(cors());
+// Allow requests from your frontend origin
+const corsOptions = {
+  origin: 'https://puyobay.vercel.app', // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+};
+
+// Use cors with options
+app.use(cors(corsOptions));
+
+// app.use(cors());
 app.use(express.json());
 
 // Use user routes
