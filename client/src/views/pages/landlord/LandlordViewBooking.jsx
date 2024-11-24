@@ -19,7 +19,7 @@ const LandlordViewBooking = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/bookings/landlord/${landlordId}`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/bookings/landlord/${landlordId}`);
         const bookings = response.data.bookings;
 
         // Separate bookings into pending and confirmed based on the boolean status
@@ -42,7 +42,7 @@ const LandlordViewBooking = () => {
   const handleUpdateStatus = async (bookingId, status, tenantEmail, tenantName) => {
     try {
       // Send 'Confirmed' or 'Rejected' as status strings to the backend
-      await axios.put(`http://localhost:5000/api/users/bookings/status/${bookingId}`, { status, tenantEmail, tenantName });
+      await axios.put(`https://puyobay.onrender.com/api/users/bookings/status/${bookingId}`, { status, tenantEmail, tenantName });
       toast.success(`Booking ${status === 'Confirmed' ? 'approved' : 'rejected'} successfully!`);
 
       // Update the booking state locally after status change

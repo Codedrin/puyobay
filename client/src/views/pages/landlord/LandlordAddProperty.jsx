@@ -111,7 +111,7 @@ const LandlordAddProperty = () => {
         userId: userId,
       };
   
-      await axios.post(`http://localhost:5000/api/users/add-property/${userId}`, propertyData);
+      await axios.post(`https://puyobay.onrender.com/api/users/add-property/${userId}`, propertyData);
   
       toast.success('Property added successfully');
       setProperty({

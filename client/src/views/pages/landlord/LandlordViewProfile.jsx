@@ -35,7 +35,7 @@ const LandlordViewProfile = () => {
 
   const fetchBusinessDetails = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/users/landlords/business-details/${userId}`);
+      const { data } = await axios.get(`https://puyobay.onrender.com/api/users/landlords/business-details/${userId}`);
       setBusinessDetails(data);
       toggleBusinessModal();
     } catch (error) {
@@ -47,7 +47,7 @@ const LandlordViewProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
+        const { data } = await axios.get(`https://puyobay.onrender.com/api/users/profile/${userId}`);
         setProfile(data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -61,7 +61,7 @@ const LandlordViewProfile = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/bookings/landlord/${userId}`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/bookings/landlord/${userId}`);
         const bookings = response.data.bookings;
 
         const pending = bookings.filter(booking => booking.status === false).length;
@@ -114,7 +114,7 @@ const LandlordViewProfile = () => {
         ...(newPassword && { password: newPassword }),
       };
 
-      await axios.put(`http://localhost:5000/api/users/profile/update/${userId}`, updatedProfile);
+      await axios.put(`https://puyobay.onrender.com/api/users/profile/update/${userId}`, updatedProfile);
 
       toast.success('Profile updated successfully');
       toggleModal();
