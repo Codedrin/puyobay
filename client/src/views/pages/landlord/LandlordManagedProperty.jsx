@@ -19,7 +19,7 @@ const LandlordManagedProperty = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/landlord-property/${userId}`, {
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/landlord-property/${userId}`, {
           params: { userId }
         });
         setProperties(response.data);
@@ -52,7 +52,7 @@ const LandlordManagedProperty = () => {
   const handleDelete = async (propertyId) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/users/delete-property/${propertyId}`);
+        await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/delete-property/${propertyId}`);
         toast.success("Property deleted successfully!");
         setProperties(properties.filter(property => property._id !== propertyId)); // Remove from UI
       } catch (error) {

@@ -16,13 +16,17 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+<<<<<<< HEAD
     "cloudinary": "^1.32.0",
+=======
+    "cloudinary": "^1.41.3",
+>>>>>>> b56d24ee7918a35786a4e68cc109a0aae16d88c1
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.9.0",
-    "mongoose": "^8.6.3",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.1",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "node": "^18.20.5",

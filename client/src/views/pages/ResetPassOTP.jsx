@@ -63,7 +63,7 @@ const ResetPassOTP = () => {
     const otpValue = otp.join(""); // Convert OTP array into a single string
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/users/verify-otp`, { otp: otpValue, userId });
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/verify-otp`, { otp: otpValue, userId });
       setMessage(response.data.message);
       setLoading(false);
 

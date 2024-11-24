@@ -29,7 +29,7 @@ const MapComponent = () => {
 
   const fetchProperties = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/get-properties`);
+      const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/get-properties`);
       const data = await response.json();
       return data; 
     } catch (error) {
