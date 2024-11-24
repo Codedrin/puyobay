@@ -14,7 +14,7 @@ const LandlordAdmin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users`);
+        const response = await axios.get('https://puyobay.onrender.com/api/users');
         setLandlords(response.data.landlords);
         setTotalTenants(response.data.totalTenants);
       } catch (error) {
@@ -51,7 +51,7 @@ const LandlordAdmin = () => {
   const fetchBusinessDetails = async (landlordId) => {
     try {
       const { data } = await axios.get(
-        `http://localhost:5000/api/users/landlords/business-details/${landlordId}`
+        `https://puyobay.onrender.com/api/users/landlords/business-details/${landlordId}`
       );
       setSelectedLandlord(data);
       toggleModal();

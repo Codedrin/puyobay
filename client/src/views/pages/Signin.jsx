@@ -37,7 +37,7 @@ const Login = () => {
 
       // Send login request with email, password, and accountType
       const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/login`,
+        'https://puyobay.onrender.com/api/users/login',
         {
           email,
           password,
