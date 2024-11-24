@@ -4,9 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'ddmgrfhwk',
+  api_key: process.env.CLOUDINARY_API_KEY || '731785262243572',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'tFGsTAxJkl0QtGClaNYKXErplNs',
 });
 
 const uploadToCloudinary = async (path, folder = 'PuyobayAssets') => {
