@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import dbcon from './config/dbcon.js'; // Adjusted relative path
+import dbcon from './config/dbcon.js';
 import cors from 'cors';
 import userRoutes from './routes/userRoutes.js'; 
 
@@ -20,7 +20,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     message: 'Something went wrong on the server!',
-    error: process.env.NODE_ENV === 'production' ? {} : err.message, // Hide detailed error messages in production
+    error: process.env.NODE_ENV === 'production' ? {} : err.message, 
   });
 });
 
