@@ -43,7 +43,7 @@ const TenantHeader = () => {
             />
             {/* Text Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
-              <span className="text-white text-lg">Beautiful Poolside Villa</span>
+              <span className="text-white text-lg">Gina’s Homestay</span>
             </div>
           </div>
           <div className="relative group">
@@ -54,7 +54,8 @@ const TenantHeader = () => {
             />
             {/* Text Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
-              <span className="text-white text-lg">Luxury House with Garden</span>
+              <span className="text-white text-lg">La Freyah’s Homestay 
+              </span>
             </div>
           </div>
           <div className="relative group">
@@ -65,7 +66,7 @@ const TenantHeader = () => {
             />
             {/* Text Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
-              <span className="text-white text-lg">Modern Apartment</span>
+              <span className="text-white text-lg">Liacel Boarding House</span>
             </div>
           </div>
           <div className="relative group">
@@ -76,7 +77,7 @@ const TenantHeader = () => {
             />
             {/* Text Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg">
-              <span className="text-white text-lg">Spacious Living Room</span>
+              <span className="text-white text-lg">Condevera Boarding House</span>
             </div>
           </div>
         </div>

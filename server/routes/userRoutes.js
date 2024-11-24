@@ -9,8 +9,9 @@ import { getBookPropertyById, submitRating, getAverageRatings } from '../control
 import { processBooking, cancelBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
 import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
-import { resetPassword } from '../controllers/userController.js';
+import { resetPassword, getBusinessDetails,updateBusinessDetails } from '../controllers/userController.js';
 import { getLandlordIncomeByMonth } from '../controllers/processBooking.js';
+
 const router = express.Router();
 
 router.post('/register',  upload.single('file'), registerUser);
@@ -32,10 +33,12 @@ router.put('/profile/update/:id', updateUserProfile);
 router.post('/add-property/:id',  addProperty); 
 router.get('/landlord-property/:id',  getPropertiesByUser); 
 router.get('/property/:id',  getPropertyById);
+router.get('/landlords/business-details/:landlordId', getBusinessDetails);
 router.put('/update-property/:id',  updateProperty); 
 router.get('/bookings/landlord/:landlordId', getBookingsByLandlord);
 router.get('/landlord-dashboard/:landlordId', getLandlordDashboardData);
 router.put('/bookings/status/:bookingId', updateBookingStatus);
+router.put('/landlords/business-details/:landlordId', updateBusinessDetails);
 router.delete('/delete-property/:id',  deleteProperty);
 
 //Tenanat 

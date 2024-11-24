@@ -391,3 +391,55 @@ export const toggleApprovalStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+// Get landlord business details
+export const getBusinessDetails = async (req, res) => {
+  const { landlordId } = req.params;
+
+  try {
+    const landlord = await User.findById(landlordId);
+    if (!landlord) {
+      return res.status(404).json({ message: 'Landlord not found' });
+    }
+
+    const businessDetails = {
+      businessName: landlord.landlordDetails?.businessName || 'Not provided',
+      businessPermit: landlord.landlordDetails?.businessPermit || 'Not provided',
+      attachment: landlord.landlordDetails?.attachment || null,
+    };
+
+    res.status(200).json(businessDetails);
+  } catch (error) {
+    console.error('Error fetching business details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update landlord business details
+export const updateBusinessDetails = async (req, res) => {
+  const { landlordId } = req.params;
+  const { businessName, businessPermit, attachment } = req.body;
+
+  try {
+    const landlord = await User.findById(landlordId);
+
+    if (!landlord) {
+      return res.status(404).json({ message: 'Landlord not found' });
+    }
+
+    landlord.landlordDetails = {
+      ...landlord.landlordDetails,
+      businessName: businessName || landlord.landlordDetails?.businessName,
+      businessPermit: businessPermit || landlord.landlordDetails?.businessPermit,
+      attachment: attachment || landlord.landlordDetails?.attachment,
+    };
+
+    await landlord.save();
+
+    res.status(200).json({ message: 'Business details updated successfully', landlordDetails: landlord.landlordDetails });
+  } catch (error) {
+    console.error('Error updating business details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

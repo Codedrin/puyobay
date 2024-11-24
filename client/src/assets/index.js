@@ -27,6 +27,7 @@ import display_img1 from '../assets/display_img1.jpg';
 import display_img2 from '../assets/display_img2.jpg';
 import display_img3 from '../assets/display_img3.jpg';
 import display_img4 from '../assets/display_img4.jpg';
+
 // Export all assets
 export {
     image1,
