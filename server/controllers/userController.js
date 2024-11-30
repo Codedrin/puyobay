@@ -393,6 +393,7 @@ export const toggleApprovalStatus = async (req, res) => {
 };
 
 
+
 // Get landlord business details
 export const getBusinessDetails = async (req, res) => {
   const { landlordId } = req.params;
@@ -415,6 +416,7 @@ export const getBusinessDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Update landlord business details
 export const updateBusinessDetails = async (req, res) => {

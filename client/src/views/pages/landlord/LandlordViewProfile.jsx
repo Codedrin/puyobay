@@ -18,7 +18,14 @@ const LandlordViewProfile = () => {
   const [confirmedCount, setConfirmedCount] = useState(0);
   const [businessDetails, setBusinessDetails] = useState(null);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
+  const [businessForm, setBusinessForm] = useState({
+    businessName: '',
+    businessPermit: '',
+    attachment: null,
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
 
+  
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id || null;
 
@@ -35,7 +42,7 @@ const LandlordViewProfile = () => {
 
   const fetchBusinessDetails = async () => {
     try {
-      const { data } = await axios.get(`https://puyobay.onrender.com/api/users/landlords/business-details/${userId}`);
+      const { data } = await axios.get(`http://localhost:5000/api/users/landlords/business-details/${userId}`);
       setBusinessDetails(data);
       toggleBusinessModal();
     } catch (error) {
@@ -44,10 +51,18 @@ const LandlordViewProfile = () => {
     }
   };
 
+  const handleBusinessChange = (e) => {
+    const { name, value, files } = e.target;
+    setBusinessForm((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
+  
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await axios.get(`https://puyobay.onrender.com/api/users/profile/${userId}`);
+        const { data } = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
         setProfile(data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -61,7 +76,7 @@ const LandlordViewProfile = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`https://puyobay.onrender.com/api/users/bookings/landlord/${userId}`);
+        const response = await axios.get(`http://localhost:5000/api/users/bookings/landlord/${userId}`);
         const bookings = response.data.bookings;
 
         const pending = bookings.filter(booking => booking.status === false).length;
@@ -114,7 +129,7 @@ const LandlordViewProfile = () => {
         ...(newPassword && { password: newPassword }),
       };
 
-      await axios.put(`https://puyobay.onrender.com/api/users/profile/update/${userId}`, updatedProfile);
+      await axios.put(`http://localhost:5000/api/users/profile/update/${userId}`, updatedProfile);
 
       toast.success('Profile updated successfully');
       toggleModal();
@@ -130,6 +145,35 @@ const LandlordViewProfile = () => {
     navigate(`/view-bookings/${userId}`);
   };
 
+  const handleUpdateBusiness = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+  
+    try {
+      const formData = new FormData();
+      formData.append('businessName', businessForm.businessName);
+      formData.append('businessPermit', businessForm.businessPermit);
+      if (businessForm.attachment) {
+        formData.append('attachment', businessForm.attachment);
+      }
+  
+      await axios.put(
+        `http://localhost:5000/api/users/landlords/business-details/${userId}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+  
+      toast.success('Business details updated successfully');
+      toggleBusinessModal();
+      fetchBusinessDetails(); // Refresh business details after update
+    } catch (error) {
+      console.error('Error updating business details:', error);
+      toast.error('Failed to update business details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <div>
       <LandlordNavbar />
@@ -160,7 +204,7 @@ const LandlordViewProfile = () => {
                 Edit Profile
               </button>
               <button
-                className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700"
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700"
                 onClick={fetchBusinessDetails}
               >
                 Business Details
@@ -172,38 +216,102 @@ const LandlordViewProfile = () => {
         <div>Loading profile...</div>
       )}
 
-      {isBusinessModalOpen && businessDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Business Details</h2>
-              <button
-                onClick={toggleBusinessModal}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                &times;
-              </button>
-            </div>
-            <div>
-              <p><strong>Business Name:</strong> {businessDetails.businessName}</p>
-              <p><strong>Business Permit:</strong> {businessDetails.businessPermit}</p>
-              {businessDetails.attachment && (
-                <div>
-                  <p><strong>Attachment:</strong></p>
-                  <a
-                    href={businessDetails.attachment.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 underline"
-                  >
-                    View Attachment
-                  </a>
-                </div>
-              )}
-            </div>
+{isBusinessModalOpen && businessDetails && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full mx-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Business Details</h2>
+        <button
+          onClick={toggleBusinessModal}
+          className="text-gray-500 hover:text-gray-700 text-2xl"
+        >
+          &times;
+        </button>
+      </div>
+
+      {/* View Business Details */}
+      <div>
+        <p><strong>Business Name:</strong> {businessDetails.businessName}</p>
+        <p><strong>Business Permit:</strong> {businessDetails.businessPermit}</p>
+        {businessDetails.attachment && (
+          <div>
+            <p><strong>Attachment:</strong></p>
+            <a
+              href={businessDetails.attachment.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              View Attachment
+            </a>
+            <button
+              onClick={() => setIsUpdating(true)}
+              className="ml-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+            >
+              Update
+            </button>
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Conditional Form for Updating Business Details */}
+      {isUpdating && (
+        <form onSubmit={handleUpdateBusiness} className="mt-4">
+          <div className="mb-4">
+            <label className="block text-gray-700">Business Name</label>
+            <input
+              type="text"
+              name="businessName"
+              value={businessForm.businessName}
+              onChange={handleBusinessChange}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="Enter new business name"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Business Permit</label>
+            <input
+              type="text"
+              name="businessPermit"
+              value={businessForm.businessPermit}
+              onChange={handleBusinessChange}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="Enter new business permit"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Attachment</label>
+            <input
+              type="file"
+              name="attachment"
+              onChange={handleBusinessChange}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => setIsUpdating(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              {loading ? (
+                <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+              ) : (
+                'Save Changes'
+              )}
+            </button>
+          </div>
+        </form>
       )}
+    </div>
+  </div>
+)}
 
       {profile && (
         <div className="container mx-auto p-4">

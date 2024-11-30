@@ -11,7 +11,7 @@ const TenantAdmin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`https://puyobay.onrender.com/api/users`);
+        const response = await axios.get(`http://localhost:5000/api/users`);
         setTenants(response.data.tenants); // Assuming tenants data is in response.data.tenants
       } catch (error) {
         console.error('Error fetching users:', error);

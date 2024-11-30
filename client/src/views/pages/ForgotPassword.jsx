@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`https://puyobay.onrender.com/api/users/forgot`, { email });
+      const response = await axios.post(`http://localhost:5000/api/users/forgot`, { email });
       setMessage(response.data.message);
       setLoading(false);
       

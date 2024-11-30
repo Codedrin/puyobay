@@ -73,7 +73,7 @@
     const handleRegularSignUp = async () => {
       try {
         setLoading(true); 
-        const response =  await axios.post(`https://puyobay.onrender.com/api/users/register`, {
+        const response =  await axios.post(`http://localhost:5000/api/users/register`, {
           ...formData,
           attachment: null,
         });
@@ -96,7 +96,7 @@
           attachmentUrl = await uploadFileToCloudinary(attachment);
         }
   
-        const response =  await axios.post(`https://puyobay.onrender.com/api/users/register`, {
+        const response =  await axios.post(`http://localhost:5000/api/users/register`, {
           ...formData,
           attachment: attachmentUrl,
         });

@@ -36,7 +36,7 @@ const Reports = () => {
     setError(''); // Reset error
 
     try {
-      const response = await axios.get(`https://puyobay.onrender.com/api/users/landlords/income?month=${formattedMonth}`);
+      const response = await axios.get(`http://localhost:5000/api/users/landlords/income?month=${formattedMonth}`);
       setLandlords(response.data); // Set the response data to state
     } catch (error) {
       setError('Error fetching landlords\' income. Please try again.');

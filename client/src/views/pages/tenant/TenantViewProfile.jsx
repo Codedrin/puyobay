@@ -25,7 +25,7 @@ const TenantViewProfile = () => {
     // Fetch profile data
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`https://puyobay.onrender.com/api/users/profile/${userId}`);
+        const response = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -38,7 +38,7 @@ const TenantViewProfile = () => {
     // Fetch bookings data
     const fetchBookings = async () => {
       try {
-        const response = await axios.get(`https://puyobay.onrender.com/api/users/bookings/${userId}`);
+        const response = await axios.get(`http://localhost:5000/api/users/bookings/${userId}`);
         setBookings(response.data.bookings);
       } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -81,7 +81,7 @@ const TenantViewProfile = () => {
       }
   
       // Send the cancellation reason as data in the DELETE request
-      await axios.delete(`https://puyobay.onrender.com/api/users/cancel-booking/${userId}/${selectedBookingId}`, {
+      await axios.delete(`http://localhost:5000/api/users/cancel-booking/${userId}/${selectedBookingId}`, {
         data: { cancellationReason },
       });
   
@@ -151,7 +151,7 @@ const TenantViewProfile = () => {
         profilePicture: profilePictureData, // Update the profile picture with the new one (if uploaded)
       };
 
-      const response = await axios.put(`https://puyobay.onrender.com/api/users/profile/update/${userId}`, updatedProfile);
+      const response = await axios.put(`http://localhost:5000/api/users/profile/update/${userId}`, updatedProfile);
       setProfile(response.data.user); // Update the state with the updated profile
       toggleModal(); // Close the modal
       alert('Profile updated successfully');
