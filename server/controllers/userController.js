@@ -423,12 +423,15 @@ export const updateBusinessDetails = async (req, res) => {
   const { landlordId } = req.params;
   const { businessName, businessPermit, attachment } = req.body;
 
+
   try {
     const landlord = await User.findById(landlordId);
+    console.log('Landlord found:', landlord);
 
     if (!landlord) {
       return res.status(404).json({ message: 'Landlord not found' });
     }
+
 
     landlord.landlordDetails = {
       ...landlord.landlordDetails,
@@ -437,7 +440,9 @@ export const updateBusinessDetails = async (req, res) => {
       attachment: attachment || landlord.landlordDetails?.attachment,
     };
 
+
     await landlord.save();
+    console.log('Landlord details saved successfully.');
 
     res.status(200).json({ message: 'Business details updated successfully', landlordDetails: landlord.landlordDetails });
   } catch (error) {

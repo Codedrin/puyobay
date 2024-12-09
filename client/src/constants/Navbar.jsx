@@ -16,7 +16,7 @@ const Navbar = () => {
     },
     {
       id: "about",
-      path: "/about",
+      path: "/#About",  // Use hash to link to the About section
       title: "About",
     },
     {

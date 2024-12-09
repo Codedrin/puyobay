@@ -84,30 +84,31 @@ const TenantHeader = () => {
       </section>
 
       {/* Subheader with Logo and About Us */}
-      <section className="bg-white py-10">
-        <div className="container mx-auto flex flex-col lg:flex-row items-center text-center lg:text-left">
-          {/* Logo Section */}
-          <div className="lg:w-1/2 flex justify-center mb-8 lg:mb-0">
-            <img src={logo} alt="Puyobay Logo" className="w-full h-full" />
-          </div>
+      <section className="bg-white py-10" id="About">
+  <div className="container mx-auto flex flex-col lg:flex-row items-center text-center lg:text-left">
+    {/* Logo Section */}
+    <div className="lg:w-1/2 flex justify-center mb-8 lg:mb-0">
+      <img src={logo} alt="Puyobay Logo" className="w-full h-full" />
+    </div>
 
-          {/* About Us Text Section */}
-          <div className="lg:w-1/3 lg:pl-21">
-            <h2 className="text-3xl font-bold mb-4">About Us</h2>
-            <p className="text-lg mb-4">
-              Puyobay is a cutting-edge house rental web application designed to simplify the property rental process for both tenants and landlords. Our platform offers a user-friendly interface where tenants can easily find and apply for rental properties, while landlords can efficiently manage their listings and tenant applications.
-            </p>
-            <div className="bg-blue-100 text-blue-700 p-4 rounded-lg mb-4">
-              <p>
-                Our mission is to bridge the gap between tenants and landlords by providing a seamless experience that prioritizes comfort and convenience. With Puyobay, you can ensure that your property is well-managed and that your rental experience is hassle-free.
-              </p>
-            </div>
-            <p className="text-lg">
-              Whether you are looking for a new home or managing rental properties, Puyobay is your go-to solution for all your rental needs.
-            </p>
-          </div>
-        </div>
-      </section>
+    {/* About Us Text Section */}
+    <div className="lg:w-1/3 lg:pl-21">
+      <h2 className="text-3xl font-bold mb-4">About Us</h2>
+      <p className="text-lg mb-4">
+        Puyobay is a cutting-edge house rental web application designed to simplify the property rental process for both tenants and landlords. Our platform offers a user-friendly interface where tenants can easily find and apply for rental properties, while landlords can efficiently manage their listings and tenant applications.
+      </p>
+      <div className="bg-blue-100 text-blue-700 p-4 rounded-lg mb-4">
+        <p>
+          Our mission is to bridge the gap between tenants and landlords by providing a seamless experience that prioritizes comfort and convenience. With Puyobay, you can ensure that your property is well-managed and that your rental experience is hassle-free.
+        </p>
+      </div>
+      <p className="text-lg">
+        Whether you are looking for a new home or managing rental properties, Puyobay is your go-to solution for all your rental needs.
+      </p>
+    </div>
+  </div>
+</section>
+
     </header>
   );
 };
