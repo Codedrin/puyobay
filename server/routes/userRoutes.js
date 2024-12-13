@@ -2,7 +2,14 @@ import express from 'express';
 import upload from '../middleware/multerMiddleware.js';
 import { registerUser, loginUser, forgotPassword, getUsersByType, toggleApprovalStatus, denyLandlord } from '../controllers/userController.js';
 import { getUserProfileById, updateUserProfile } from '../controllers/LandlordProfileController.js';
-import { addProperty, getPropertiesByUser, getRoomsByPropertyId, getPropertyById, updateProperty, deleteProperty } from '../controllers/landlordAddProperty.js';
+import { addProperty, 
+    getPropertiesByUser, 
+    getRoomsByPropertyId, 
+    updateRoomById, 
+    removeRoomById,
+    getPropertyById, 
+    updateProperty, 
+    deleteProperty } from '../controllers/landlordAddProperty.js';
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
 import { getAllProperties, getPropertyCount } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
@@ -33,6 +40,8 @@ router.put('/profile/update/:id', updateUserProfile);
 router.post('/add-property/:id',  addProperty); 
 router.get('/landlord-property/:id',  getPropertiesByUser); 
 router.get('/:propertyId/rooms', getRoomsByPropertyId);
+router.put('/:propertyId/rooms/:roomId', updateRoomById);
+router.delete('/:propertyId/rooms/:roomId', removeRoomById);
 router.get('/property/:id',  getPropertyById);
 router.get('/landlords/business-details/:landlordId', getBusinessDetails);
 router.put('/update-property/:id',  updateProperty); 

@@ -4,7 +4,9 @@ import LandlordNavbar from '../../../constants/LandlordNavbar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
-import { useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported
+import { useNavigate } from 'react-router-dom';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 Modal.setAppElement('#root');
 
@@ -13,16 +15,18 @@ const LandlordManagedProperty = () => {
   const [rooms, setRooms] = useState([]);
   const [isRoomsModalOpen, setIsRoomsModalOpen] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState({}); // To track current image index for each room
+  const [editableRoom, setEditableRoom] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [loadingButton, setLoadingButton] = useState(null); // For button loading state
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
-  const navigate = useNavigate(); // Use useNavigate hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/users/landlord-property/${userId}`, {
-          params: { userId }
+          params: { userId },
         });
         setProperties(response.data);
       } catch (error) {
@@ -31,9 +35,7 @@ const LandlordManagedProperty = () => {
       }
     };
 
-    if (userId) {
-      fetchProperties();
-    }
+    if (userId) fetchProperties();
   }, [userId]);
 
   const openRoomsModal = async (propertyId) => {
@@ -42,14 +44,6 @@ const LandlordManagedProperty = () => {
     try {
       const response = await axios.get(`http://localhost:5000/api/users/${propertyId}/rooms`);
       setRooms(response.data);
-
-      // Initialize the current image index for each room
-      const initialIndexes = {};
-      response.data.forEach((_, idx) => {
-        initialIndexes[idx] = 0;
-      });
-      setCurrentImageIndex(initialIndexes);
-
       setIsRoomsModalOpen(true);
     } catch (error) {
       console.error('Error fetching rooms:', error);
@@ -61,7 +55,8 @@ const LandlordManagedProperty = () => {
     setIsRoomsModalOpen(false);
     setSelectedPropertyId(null);
     setRooms([]);
-    setCurrentImageIndex({});
+    setEditableRoom(null);
+    setImageFiles([]);
   };
 
   const handleUpdate = (propertyId) => {
@@ -70,13 +65,16 @@ const LandlordManagedProperty = () => {
 
   const handleDelete = async (propertyId) => {
     if (window.confirm('Are you sure you want to delete this property?')) {
+      setLoadingButton(propertyId);
       try {
         await axios.delete(`http://localhost:5000/api/users/delete-property/${propertyId}`);
         toast.success('Property deleted successfully!');
-        setProperties(properties.filter(property => property._id !== propertyId));
+        setProperties(properties.filter((property) => property._id !== propertyId));
       } catch (error) {
         console.error('Error deleting property:', error);
         toast.error('Failed to delete property');
+      } finally {
+        setLoadingButton(null);
       }
     }
   };
@@ -85,126 +83,284 @@ const LandlordManagedProperty = () => {
     navigate('/add-property');
   };
 
-  const nextImage = (roomIndex) => {
-    setCurrentImageIndex((prevIndexes) => ({
-      ...prevIndexes,
-      [roomIndex]: (prevIndexes[roomIndex] + 1) % rooms[roomIndex].images.length, // Loop back to the first image
-    }));
+  const handleEditRoom = (room) => {
+    setEditableRoom(room);
   };
 
-  const previousImage = (roomIndex) => {
-    setCurrentImageIndex((prevIndexes) => ({
-      ...prevIndexes,
-      [roomIndex]:
-        (prevIndexes[roomIndex] - 1 + rooms[roomIndex].images.length) %
-        rooms[roomIndex].images.length, // Loop back to the last image
-    }));
+  const handleRoomChange = (e) => {
+    const { name, value } = e.target;
+    setEditableRoom({ ...editableRoom, [name]: value });
+  };
+
+  const handleImageChange = (e) => {
+    setImageFiles(Array.from(e.target.files));
+  };
+
+  const uploadImages = async () => {
+    const uploadedImages = [];
+    for (const file of imageFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'PuyobayAssets');
+      try {
+        const response = await axios.post('https://api.cloudinary.com/v1_1/ddmgrfhwk/upload', formData);
+        uploadedImages.push({ url: response.data.secure_url, publicId: response.data.public_id });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to upload image');
+      }
+    }
+    return uploadedImages;
+  };
+
+  const handleSaveRoom = async () => {
+    setLoadingButton(editableRoom._id);
+    try {
+      let uploadedImages = [];
+      if (imageFiles.length > 0) {
+        uploadedImages = await uploadImages();
+      }
+
+      const updatedRoom = {
+        ...editableRoom,
+        images: [...editableRoom.images, ...uploadedImages],
+      };
+
+      const response = await axios.put(
+        `http://localhost:5000/api/users/${selectedPropertyId}/rooms/${editableRoom._id}`,
+        updatedRoom
+      );
+
+      toast.success('Room updated successfully!');
+      setRooms((prevRooms) =>
+        prevRooms.map((room) => (room._id === editableRoom._id ? response.data : room))
+      );
+      setEditableRoom(null);
+      setImageFiles([]);
+    } catch (error) {
+      console.error('Error updating room:', error);
+      toast.error('Failed to update room');
+    } finally {
+      setLoadingButton(null);
+    }
+  };
+
+  const handleRemoveRoom = async (roomId) => {
+    if (window.confirm('Are you sure you want to remove this room?')) {
+      setLoadingButton(roomId);
+      try {
+        await axios.delete(`http://localhost:5000/api/users/${selectedPropertyId}/rooms/${roomId}`);
+        toast.success('Room removed successfully!');
+        setRooms((prevRooms) => prevRooms.filter((room) => room._id !== roomId));
+      } catch (error) {
+        console.error('Error removing room:', error);
+        toast.error('Failed to remove room');
+      } finally {
+        setLoadingButton(null);
+      }
+    }
   };
 
   return (
     <div>
-      <LandlordNavbar />
-      <ToastContainer />
-      <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Manage Properties</h1>
-          <button
-            onClick={handleAddProperty}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
-          >
-            + Add Property
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property) => (
-            <div key={property._id} className="border rounded-lg p-4 shadow-lg">
-              <img
-                src={property.images[0]?.url || 'https://via.placeholder.com/300'}
-                alt={property.propertyName}
-                className="w-full h-48 object-cover mb-4"
-              />
-              <h2 className="text-2xl text-gray-800 font-semibold">{property.propertyName}</h2>
-              <p className="mb-3">Location: {property.address}</p>
-              <p>
-                <span
-                  onClick={() => openRoomsModal(property._id)}
-                  className="text-blue-600 underline cursor-pointer"
-                >
-                  View Rooms
-                </span>
-              </p>
-              <div className="flex mt-4 space-x-3">
-                <button
-                  onClick={() => handleUpdate(property._id)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                >
-                  Update
-                </button>
-                <button
-                  onClick={() => handleDelete(property._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <LandlordNavbar />
+    <ToastContainer />
+    <div className="container mx-auto p-4">
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4">Manage Properties</h1>
+     
+        <button
+          onClick={handleAddProperty}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+        >
+          + Add Property
+        </button>
       </div>
-
-      {/* Rooms Modal */}
-      <Modal
-        isOpen={isRoomsModalOpen}
-        onRequestClose={closeRoomsModal}
-        contentLabel="Rooms Modal"
-        className="bg-white w-full sm:w-11/12 md:w-3/4 lg:w-1/2 max-w-lg mx-auto my-10 p-6 rounded-lg shadow-lg overflow-y-auto"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Rooms</h2>
-          <button onClick={closeRoomsModal} className="text-gray-600 text-xl font-bold">X</button>
-        </div>
-
-        <hr className="border-gray-300 mb-4" />
-
-        <div className="text-left">
-          {rooms.length > 0 ? (
-            rooms.map((room, index) => (
-              <div key={index} className="mb-4 border-b pb-4">
-                {/* Carousel for Room Images */}
-                <div className="relative w-full h-40 mb-4 flex items-center justify-center">
-                  <button
-                    onClick={() => previousImage(index)}
-                    className="absolute left-0 p-2 bg-black text-white rounded-full"
-                  >
-                    &lt;
-                  </button>
-                  <img
-                    src={room.images[currentImageIndex[index]]?.url || 'https://via.placeholder.com/300'}
-                    alt={`Room Image ${currentImageIndex[index] + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {properties.map((property) => (
+          <div key={property._id} className="border rounded-lg p-3 sm:p-4 shadow-lg">
+            {property.images.length > 0 ? (
+              <Carousel
+                showThumbs={false}
+                infiniteLoop
+                dynamicHeight
+                className="mb-3 sm:mb-4"
+                style={{ zIndex: 10 }}
+              >
+                {property.images.map((image, index) => (
+                  <div key={index}>
+                    <img
+                      src={image.url || 'https://via.placeholder.com/300'}
+                      alt={`Property Image ${index + 1}`}
+                      className="object-cover w-full h-40 sm:h-48 rounded-lg"
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            ) : (
+              <img
+                src="https://via.placeholder.com/300"
+                alt="Placeholder"
+                className="w-full h-40 sm:h-48 object-cover mb-3 sm:mb-4"
+              />
+            )}
+            <h2 className="text-lg sm:text-xl text-gray-800 font-semibold">{property.propertyName}</h2>
+            <p className="mb-2 sm:mb-3 text-sm sm:text-base">Location: {property.address}</p>
+            <p>
+              <span
+                onClick={() => openRoomsModal(property._id)}
+                className="text-blue-600 underline cursor-pointer text-sm sm:text-base"
+              >
+                View {property.rooms?.length || 0} {property.rooms?.length === 1 ? 'Room' : 'Rooms'}
+              </span>
+            </p>
+            <div className="flex mt-3 sm:mt-4 space-x-2 sm:space-x-3">
+              <button
+                onClick={() => handleUpdate(property._id)}
+                className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm sm:text-base"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => handleDelete(property._id)}
+                className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm sm:text-base"
+                disabled={loadingButton === property._id}
+              >
+                {loadingButton === property._id ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  
+    <Modal
+      isOpen={isRoomsModalOpen}
+      onRequestClose={closeRoomsModal}
+      contentLabel="Rooms Modal"
+      className="bg-white w-11/12 sm:w-4/5 md:w-3/5 lg:w-1/2 max-w-lg mx-auto my-10 p-4 sm:p-6 rounded-lg shadow-lg overflow-y-auto"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl sm:text-2xl font-semibold">Rooms</h2>
+        <button
+          onClick={closeRoomsModal}
+          className="text-gray-600 text-lg sm:text-xl font-bold"
+        >
+          X
+        </button>
+      </div>
+      <hr className="border-gray-300 mb-4" />
+      <div className="text-left">
+        {rooms.length > 0 ? (
+          rooms.map((room, index) => (
+            <div key={index} className="mb-4 border-b pb-4">
+              {editableRoom && editableRoom._id === room._id ? (
+                <div>
+                  <input
+                    type="text"
+                    name="roomName"
+                    value={editableRoom.roomName}
+                    onChange={handleRoomChange}
+                    className="mb-2 p-2 border rounded-lg w-full text-sm sm:text-base"
+                    placeholder="Room Name"
+                  />
+                  <input
+                    type="number"
+                    name="availablePersons"
+                    value={editableRoom.availablePersons}
+                    onChange={handleRoomChange}
+                    className="mb-2 p-2 border rounded-lg w-full text-sm sm:text-base"
+                    placeholder="Available Persons"
+                  />
+                  <input
+                    type="number"
+                    name="price"
+                    value={editableRoom.price}
+                    onChange={handleRoomChange}
+                    className="mb-2 p-2 border rounded-lg w-full text-sm sm:text-base"
+                    placeholder="Price"
+                  />
+                  <textarea
+                    name="description"
+                    value={editableRoom.description}
+                    onChange={handleRoomChange}
+                    className="mb-2 p-2 border rounded-lg w-full text-sm sm:text-base"
+                    placeholder="Description"
+                  />
+                  <label className="block text-gray-700 mb-2 text-sm sm:text-base">
+                    Upload New Images
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleImageChange}
+                    className="mb-4 p-2 border rounded-lg w-full text-sm sm:text-base"
                   />
                   <button
-                    onClick={() => nextImage(index)}
-                    className="absolute right-0 p-2 bg-black text-white rounded-full"
+                    onClick={handleSaveRoom}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg mr-2 text-sm sm:text-base"
+                    disabled={loadingButton === editableRoom._id}
                   >
-                    &gt;
+                    {loadingButton === editableRoom._id ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => setEditableRoom(null)}
+                    className="px-4 py-2 bg-gray-400 text-white rounded-lg text-sm sm:text-base"
+                  >
+                    Cancel
                   </button>
                 </div>
-
-                <p><strong>Name:</strong> {room.roomName}</p>
-                <p><strong>Available Persons:</strong> {room.availablePersons}</p>
-                <p><strong>Price:</strong> {room.price}</p>
-                <p><strong>Description:</strong> {room.description}</p>
-                <p><strong>Room Area:</strong> {room.roomArea}</p>
-              </div>
-            ))
-          ) : (
-            <p>No rooms available for this property.</p>
-          )}
-        </div>
-      </Modal>
-    </div>
+              ) : (
+                <div>
+                  <Carousel showThumbs={false} infiniteLoop dynamicHeight className="mb-4">
+                    {room.images.map((image, imgIndex) => (
+                      <div key={imgIndex}>
+                        <img
+                          src={image.url || 'https://via.placeholder.com/300'}
+                          alt={`Room Image ${imgIndex + 1}`}
+                          className="object-cover w-full h-32 sm:h-40 rounded-lg"
+                        />
+                      </div>
+                    ))}
+                  </Carousel>
+                  <p className="text-sm sm:text-base">
+                    <strong>Name:</strong> {room.roomName}
+                  </p>
+                  <p className="text-sm sm:text-base">
+                    <strong>Available Persons:</strong> {room.availablePersons}
+                  </p>
+                  <p className="text-sm sm:text-base">
+                    <strong>Price:</strong> {room.price}
+                  </p>
+                  <p className="text-sm sm:text-base">
+                    <strong>Description:</strong> {room.description}
+                  </p>
+                  <div className="flex mt-3 sm:mt-4 space-x-2 sm:space-x-3">
+                    <button
+                      onClick={() => handleEditRoom(room)}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm sm:text-base"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleRemoveRoom(room._id)}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm sm:text-base"
+                      disabled={loadingButton === room._id}
+                    >
+                      {loadingButton === room._id ? 'Removing...' : 'Remove'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-sm sm:text-base">No rooms available for this property.</p>
+        )}
+      </div>
+    </Modal>
+  </div>
   );
 };
 

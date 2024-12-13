@@ -201,9 +201,6 @@ import Property from "../models/addNewProperty.js";
   };
 
 
-
-  
-
 // Get Properties by User ID
 export const getPropertiesByUser = async (req, res) => {
     const userId = req.query.userId; // Fetch userId from query parameters
@@ -219,6 +216,8 @@ export const getPropertiesByUser = async (req, res) => {
       res.status(500).json({ message: 'Error fetching properties', error });
     }
   };
+  
+  //Get rooms byPropertyID
   export const getRoomsByPropertyId = async (req, res) => {
     const { propertyId } = req.params;
   
@@ -232,11 +231,56 @@ export const getPropertiesByUser = async (req, res) => {
       res.status(500).json({ message: 'Error fetching rooms', error });
     }
   };
-    
   
+  //Update Rooms by property ID
+  export const updateRoomById = async (req, res) => {
+    const { propertyId, roomId } = req.params;
+    const updatedRoomData = req.body;
+  
+    try {
+      const property = await Property.findById(propertyId);
+      if (!property) {
+        return res.status(404).json({ message: 'Property not found' });
+      }
+  
+      const roomIndex = property.rooms.findIndex((room) => room._id.toString() === roomId);
+      if (roomIndex === -1) {
+        return res.status(404).json({ message: 'Room not found' });
+      }
+  
+      property.rooms[roomIndex] = { ...property.rooms[roomIndex].toObject(), ...updatedRoomData };
+      await property.save();
+  
+      res.status(200).json(property.rooms[roomIndex]);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating room', error });
+    }
+  };
 
-
-
+  // Remove Rooms by property ID
+  export const removeRoomById = async (req, res) => {
+    const { propertyId, roomId } = req.params;
+  
+    try {
+      const property = await Property.findById(propertyId);
+      if (!property) {
+        return res.status(404).json({ message: 'Property not found' });
+      }
+  
+      const roomIndex = property.rooms.findIndex((room) => room._id.toString() === roomId);
+      if (roomIndex === -1) {
+        return res.status(404).json({ message: 'Room not found' });
+      }
+  
+      property.rooms.splice(roomIndex, 1);
+      await property.save();
+  
+      res.status(200).json({ message: 'Room removed successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error removing room', error });
+    }
+  };
+  
   
   // Get Single Property by ID
   export const getPropertyById = async (req, res) => {
@@ -258,18 +302,26 @@ export const updateProperty = async (req, res) => {
   const { id } = req.params; // Property ID passed as a parameter
 
   try {
+    console.log('Received request to update property.');
+    console.log('Property ID:', id); // Log the property ID
+    console.log('Request Body:', req.body); // Log the incoming data from the client
+
     const updatedData = req.body; // The updated property data from the client
     const updatedProperty = await Property.findByIdAndUpdate(id, updatedData, { new: true });
 
     if (!updatedProperty) {
+      console.log('Property not found for ID:', id); // Log if the property is not found
       return res.status(404).json({ message: 'Property not found' });
     }
 
+    console.log('Property updated successfully:', updatedProperty); // Log the updated property
     res.status(200).json(updatedProperty); // Return the updated property
   } catch (error) {
+    console.error('Error updating property:', error); // Log the error
     res.status(500).json({ message: 'Error updating property', error });
   }
 };
+
 
   
       // Delete Property

@@ -143,19 +143,19 @@ const propertySchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     address: {
       type: String,
-      required: true,
+      required: false,
     },
     price: {
       type: Number,
-      required: true,
+      required: false,
     },
     area: {
       type: String, // Changed to String to match "San Isidro" or "Del Carmen"
-      required: true,
+      required: false,
       enum: ['San Isidro', 'Del Carmen'], // Only allow these values
     },
   
@@ -208,15 +208,15 @@ const propertySchema = new mongoose.Schema(
         },
         availablePersons: {
           type: Number,
-          required: true,
+          required: false,
         },
         price: {
           type: Number,
-          required: true,
+          required: false,
         },
         description: {
           type: String,
-          required: true,
+          required: false,
         },
         roomArea: {
           type: String,
