@@ -77,8 +77,8 @@ import Property from "../models/addNewProperty.js";
       address,
       price,
       area, // Enum field with allowed values
-      latitude,
-      longitude,
+      lat,
+      lang,
       propertyType,
       propertyArea,
       images,
@@ -180,8 +180,8 @@ import Property from "../models/addNewProperty.js";
         address,
         price: priceAsNumber,
         area, // String that matches the enum
-        latitude,
-        longitude,
+        lat,
+        lang,
         type: propertyType,
         roomArea: propertyArea, // Matches the schema field
         images,

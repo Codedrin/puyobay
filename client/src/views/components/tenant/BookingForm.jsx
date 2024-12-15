@@ -11,6 +11,7 @@ import axios from 'axios';
 const BookingForm = () => {
     const { propertyId } = useParams();
     const [property, setProperty] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         age: '',
@@ -118,11 +119,13 @@ const BookingForm = () => {
                 ...formData,
                 userId,
                 propertyId,
+                selectedRoom, 
                 paymentDetails: {
                     referenceNumber: paymentDetails.referenceNumber,
                     mobileNumberUsed: paymentDetails.mobileNumberUsed,
                     senderName: paymentDetails.senderName,
                     receipt: receiptData,
+                    
                 },
             };
 
@@ -249,6 +252,23 @@ const BookingForm = () => {
                         </select>
                     </div>
 
+                    {/* Room Dropdown */}
+                    <div>
+                        <select
+                            name="selectedRoom"
+                            className="w-full border px-3 py-2 rounded"
+                            value={selectedRoom}
+                            onChange={(e) => setSelectedRoom(e.target.value)}
+                            required
+                        >
+                            <option value="">Select Room</option>
+                            {property?.rooms?.map((room, index) => (
+                                <option key={index} value={room.roomName}>
+                                    {room.roomName} - {room.roomArea} sq ft - ₱{room.price}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <button
                         type="submit"
                         className="col-span-1 sm:col-span-2 bg-blue-500 text-white px-4 py-2 rounded w-full"

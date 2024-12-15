@@ -168,11 +168,11 @@ const propertySchema = new mongoose.Schema(
       required: false,
       enum: ['House', 'Apartment'],
     },
-    latitude: {
+    lat: {
       type: String,
       required: true,
     },
-    longitude: {
+    lang: {
       type: String,
       required: true,
     },

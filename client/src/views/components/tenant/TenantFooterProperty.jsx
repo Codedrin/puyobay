@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -7,15 +7,19 @@ const TenantFooterProperty = () => {
   const [properties, setProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const propertiesPerPage = 9; // Display 9 properties per page
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  // Fetch properties with average ratings from the API
+  // Fetch properties with actual room counts from the API
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/get-average-ratings`); // Fetch with average ratings
+        const response = await fetch(`http://localhost:5000/api/users/get-properties`);
         const data = await response.json();
-        setProperties(data);
+        const enrichedData = data.map((property) => ({
+          ...property,
+          actualRoomCount: property.rooms ? property.rooms.length : 0, // Calculate actualRoomCount dynamically
+        }));
+        setProperties(enrichedData);
       } catch (error) {
         console.error('Error fetching properties:', error);
       }
@@ -78,18 +82,19 @@ const TenantFooterProperty = () => {
                 </div>
                 <p className="mt-2">{property.description}</p>
                 <p>
-              <strong>Available Rooms:</strong> {property.availableRooms > 0 ? property.availableRooms : 'No available rooms'}
-            </p>
-                <p><strong>Price:</strong> ₱{property.price}</p> 
-                <p><strong>Area:</strong> {property.area} sq ft</p>
-                <button 
+                  <strong>Available Rooms:</strong>{' '}
+                  {property.actualRoomCount > 0 ? property.actualRoomCount : 'No available rooms'}
+                </p>
+                <p><strong>Price:</strong> ₱{property.price}</p>
+                <p><strong>Area:</strong> {property.roomArea} sq ft</p>
+                <button
                   className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 
-                              ${property.availableRooms === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+                              ${property.actualRoomCount === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
                   onClick={() => handleBook(property._id)}
-                  disabled={property.availableRooms === 0}
+                  disabled={property.actualRoomCount === 0}
                 >
-                   View
-                 </button>
+                  View
+                </button>
               </div>
             </div>
           ))}

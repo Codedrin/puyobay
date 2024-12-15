@@ -17,7 +17,8 @@ export const processBooking = async (req, res) => {
     checkOutDate,
     persons,
     paymentMethod,
-    paymentDetails // Payment details, including receipt data, will come from req.body
+    paymentDetails, // Payment details, including receipt data, will come from req.body
+    selectedRoom,
   } = req.body;
 
   try {
@@ -29,6 +30,11 @@ export const processBooking = async (req, res) => {
       return res.status(404).json({ message: 'User or Property not found' });
     }
 
+    // Check if the selected room exists in the property
+    const room = property.rooms.find((r) => r.roomName === selectedRoom);
+    if (!room) {
+      return res.status(400).json({ message: 'Selected room does not exist in the property' });
+    }
     // Payment-related logic
     let receipt = { publicId: '', url: '' };
     if (paymentMethod === 'GCash' && paymentDetails.receipt) {
@@ -37,7 +43,7 @@ export const processBooking = async (req, res) => {
     }
 
     // Admin share and net income calculations
-    const totalIncome = property.price;
+    const totalIncome = room.price || property.price; 
     const adminShare = totalIncome * 0.03;
     const netIncome = totalIncome - adminShare;
 
@@ -52,6 +58,7 @@ export const processBooking = async (req, res) => {
       checkOutDate,
       persons,
       paymentMethod,
+      selectedRoom,
       paymentDetails: {
         referenceNumber: paymentMethod === 'GCash' ? paymentDetails.referenceNumber : null,
         mobileNumberUsed: paymentMethod === 'GCash' ? paymentDetails.mobileNumberUsed : null,

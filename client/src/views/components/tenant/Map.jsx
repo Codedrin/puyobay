@@ -13,7 +13,7 @@ const houseIcon = new L.DivIcon({
   popupAnchor: [0, -10],
 });
 
-const MapComponent = () => {
+const Map = () => {
   const [properties, setProperties] = useState([]); // State to hold properties data
   const navigate = useNavigate(); // Hook to navigate between routes
 
@@ -35,7 +35,7 @@ const MapComponent = () => {
   // Handle Book Now navigation
   const handleBookNow = (propertyId) => {
     navigate(`/book-property/${propertyId}`); // Navigate using the property ID
-  };
+  };  
 
   // Function to render star rating
   const renderStars = (rating) => {
@@ -70,6 +70,11 @@ const MapComponent = () => {
           {/* Markers for each property */}
           {properties.map((property) => {
             if (property.lat && property.lang) {
+              // Calculate available rooms count
+              const availableRoomCount = property.rooms
+                ? property.rooms.filter((room) => room.availablePersons > 0).length
+                : 0;
+
               return (
                 <Marker
                   key={property._id}
@@ -86,8 +91,8 @@ const MapComponent = () => {
                       />
                       <p>{property.description}</p>
                       <p><strong>Price:</strong> ₱{property.price}</p>
-                      <p><strong>Rooms Available:</strong> {property.availableRooms}</p>
-                      <p><strong>Area:</strong> {property.area} sq ft</p>
+                      <p><strong>Rooms Available:</strong> {availableRoomCount}</p>
+                      <p><strong>Area:</strong> {property.roomArea} sq ft</p>
                       <div className="flex mb-2">
                         {renderStars(property.averageRating || 0)}
                       </div>
@@ -110,4 +115,4 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default Map;

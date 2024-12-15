@@ -13,8 +13,8 @@ const LandlordAddProperty = () => {
     address: '',
     price: '',
     area: 'San Isidro', // Default value
-    longitude: '',
-    latitude: '',
+    lang: '',
+    lat: '',
     propertyType: '',
     propertyArea: '', // Add propertyArea to the form
   });
@@ -148,8 +148,8 @@ const LandlordAddProperty = () => {
         address: '',
         price: '',
         area: 'San Isidro', // Reset to default
-        longitude: '',
-        latitude: '',
+        lang: '',
+        lat: '',
         propertyType: '',
         propertyArea: '',
       });
@@ -173,7 +173,7 @@ const LandlordAddProperty = () => {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Add New Property</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {['propertyName', 'description', 'address', 'price', 'longitude', 'latitude'].map((field, index) => (
+          {['propertyName', 'description', 'address', 'price', 'lang', 'lat'].map((field, index) => (
               <div className="mb-4" key={index}>
                 <label className="block text-gray-700 capitalize">{field.replace(/([A-Z])/g, ' $1')}</label>
                 <input
@@ -182,6 +182,13 @@ const LandlordAddProperty = () => {
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none"
                   value={property[field]}
                   onChange={handleChange}
+                  placeholder={
+                    field === 'lang'
+                      ? '125.96840777495305'
+                      : field === 'lat'
+                      ? '9.871556045663597'
+                      : ''
+                  }
                   required
                 />
               </div>

@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import toast from 'react-hot-toast'; 
+import toast from 'react-hot-toast';
 
 const center = [9.8486, 126.0458];
 
@@ -31,16 +31,21 @@ const MapComponent = () => {
     try {
       const response = await fetch(`http://localhost:5000/api/users/get-properties`);
       const data = await response.json();
-      return data; 
+      // Add `actualRoomCount` dynamically to each property
+      const enrichedData = data.map((property) => ({
+        ...property,
+        actualRoomCount: property.rooms ? property.rooms.length : 0,
+      }));
+      return enrichedData;
     } catch (error) {
       console.error('Error fetching properties:', error);
-      return []; 
+      return [];
     }
   };
 
   useEffect(() => {
     const fetchAllProperties = async () => {
-      const allProperties = await fetchProperties(); 
+      const allProperties = await fetchProperties();
       setProperties(allProperties);
     };
     fetchAllProperties();
@@ -49,13 +54,11 @@ const MapComponent = () => {
   const handleSearch = async () => {
     const fetchedProperties = await fetchProperties();
 
-    const filteredProperties = fetchedProperties.filter(property => {
-      const { propertyName, price, averageRating, selectArea, availableRooms } = property;
+    const filteredProperties = fetchedProperties.filter((property) => {
+      const { propertyName, price, averageRating, area, actualRoomCount } = property;
 
-      // Handle price filtering
       const priceMatch = price.toString() === searchQuery; // Exact price match
-      // Handle rating filtering (supports ranges like "1-5" and single numbers)
-      const ratingMatch = searchQuery.split(',').some(query => {
+      const ratingMatch = searchQuery.split(',').some((query) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery.includes('-')) {
           const [min, max] = trimmedQuery.split('-').map(Number);
@@ -63,31 +66,27 @@ const MapComponent = () => {
         }
         return averageRating === Number(trimmedQuery);
       });
-      // Handle area matching
-      const areaMatch = selectArea.toLowerCase().includes(searchQuery.toLowerCase());
-      // Handle name matching
+      const areaMatch = area.toLowerCase().includes(searchQuery.toLowerCase());
       const nameMatch = propertyName.toLowerCase().includes(searchQuery.toLowerCase());
-      // Handle rooms available filtering (supports ranges and exact matches)
-      const roomsMatch = searchQuery.split(',').some(query => {
+      const roomsMatch = searchQuery.split(',').some((query) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery.includes('-')) {
           const [min, max] = trimmedQuery.split('-').map(Number);
-          return availableRooms >= min && availableRooms <= max;
+          return actualRoomCount >= min && actualRoomCount <= max;
         }
-        return availableRooms === Number(trimmedQuery);
+        return actualRoomCount === Number(trimmedQuery);
       });
 
       return priceMatch || ratingMatch || areaMatch || nameMatch || roomsMatch;
     });
 
     if (filteredProperties.length === 0) {
-      toast.error("No matching properties found."); 
-      return; 
+      toast.error('No matching properties found.');
+      return;
     }
 
     setProperties(filteredProperties);
 
-    // Set map center to the first matching property if available
     if (filteredProperties.length > 0) {
       setMapCenter([filteredProperties[0].lat, filteredProperties[0].lang]);
     }
@@ -161,9 +160,9 @@ const MapComponent = () => {
                   />
                   <p>{property.description}</p>
                   <p><strong>Price:</strong> ₱{property.price}</p>
-                  <p><strong>Rooms Available:</strong> {property.availableRooms}</p>
+                  <p><strong>Rooms Available:</strong> {property.actualRoomCount}</p>
                   <p><strong>Area:</strong> {property.area} sq ft</p>
-                  <p><strong>Location:</strong> {property.selectArea}</p>
+                  <p><strong>Location:</strong> {property.area}</p>
                   <div className="flex mb-2">
                     {renderStars(property.averageRating || 0)}
                   </div>

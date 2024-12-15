@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom'; 
-import 'react-toastify/dist/ReactToastify.css'; 
-import TenantNavbar from '../../../constants/TenantNabar'; 
-import Slider from 'react-slick'; 
+import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+import TenantNavbar from '../../../constants/TenantNabar';
+import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const BookProperty = () => {
-  const { propertyId } = useParams(); 
+  const { propertyId } = useParams();
   const [property, setProperty] = useState(null);
-  const [otherProperties, setOtherProperties] = useState([]); 
-  const [rating, setRating] = useState(0); 
-  const navigate = useNavigate(); 
+  const [otherProperties, setOtherProperties] = useState([]);
+  const [rating, setRating] = useState(0);
+  const navigate = useNavigate();
 
   const getUserFromLocalStorage = () => {
     const user = localStorage.getItem('user');
@@ -101,12 +101,12 @@ const BookProperty = () => {
     navigate(`/book-house/${propertyId}`);
   };
 
-  // Settings for react-slick carousel for property images
-  const propertyImageSettings = {
+  // Settings for react-slick carousel for room images
+  const roomImageSettings = {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 1, // Show one image at a time for the property
+    slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
@@ -117,7 +117,7 @@ const BookProperty = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3, // Show 3 other properties at a time
+    slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
@@ -148,10 +148,9 @@ const BookProperty = () => {
         <h2 className="text-3xl font-bold text-blue-600">{property.propertyName}</h2>
 
         <div className="flex flex-col md:flex-row gap-6 mt-6">
-          {/* Check if there are multiple images to display a carousel */}
           <div className="w-full md:w-1/2">
             {property.images.length > 1 ? (
-              <Slider {...propertyImageSettings}>
+              <Slider {...roomImageSettings}>
                 {property.images.map((image, index) => (
                   <div key={index}>
                     <img
@@ -173,11 +172,11 @@ const BookProperty = () => {
 
           <div className="md:w-1/2">
             <p>
-              <strong>Available Rooms:</strong> {property.availableRooms > 0 ? property.availableRooms : 'No available rooms'}
+              <strong>Available Rooms:</strong> {property.rooms?.length > 0 ? property.rooms.length : 'No available rooms'}
             </p>
             <p><strong>Price:</strong> ₱{property.price}</p>
             <p><strong>Details:</strong> {property.description}</p>
-            <p><strong>Area:</strong> {property.area} sq ft</p>
+            <p><strong>Area:</strong> {property.roomArea} sq ft</p>
             <p><strong>Address:</strong> {property.address}</p>
 
             <div className="flex items-center space-x-4 mt-4">
@@ -190,18 +189,56 @@ const BookProperty = () => {
 
               <button
                 className={`px-4 py-2 rounded text-white 
-                ${property.availableRooms === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+                ${property.rooms?.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
                 onClick={handleBookingForm}
-                disabled={property.availableRooms === 0}
+                disabled={property.rooms?.length === 0}
               >
                 Book Now
               </button>
-
             </div>
           </div>
         </div>
 
-        {/* Rating and Other Properties Section */}
+
+        {/* Rooms Section */}
+        {property.rooms && property.rooms.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-2xl font-bold mb-4 text-blue-600">Rooms in this Property</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {property.rooms.map((room, index) => (
+                <div key={index} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                  {room.images?.length > 1 ? (
+                    <Slider {...roomImageSettings}>
+                      {room.images.map((image, imageIndex) => (
+                        <div key={imageIndex}>
+                          <img
+                            src={image.url}
+                            alt={`Room image ${imageIndex + 1}`}
+                            className="w-full h-40 object-cover"
+                          />
+                        </div>
+                      ))}
+                    </Slider>
+                  ) : (
+                    <img
+                      src={room.images[0]?.url}
+                      alt={`Room image`}
+                      className="w-full h-40 object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h4 className="text-xl font-bold">{room.roomName}</h4>
+                    <p><strong>Available Persons:</strong> {room.availablePersons || 'N/A'}</p>
+                    <p><strong>Price:</strong> ₱{room.price}</p>
+                    <p><strong>Area:</strong> {room.roomArea || 'N/A'}</p>
+                    <p><strong>Description:</strong> {room.description || 'No description available'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Rating Section */}
         <div className="mt-8">
           <h3 className="text-2xl font-bold">Rate this property:</h3>
           <div className="flex gap-2">
@@ -223,7 +260,7 @@ const BookProperty = () => {
           </button>
         </div>
 
-        {/* Other properties carousel */}
+        {/* Other Properties Section */}
         <div className="mt-10">
           <h3 className="text-2xl font-bold mb-4">Other Properties You May Like</h3>
           <Slider {...otherPropertySettings}>
@@ -236,7 +273,7 @@ const BookProperty = () => {
                     <p className="text-gray-600 mb-2">{prop.description}</p>
                     <div className="flex mb-2">{renderStars(prop.averageRating || 0)}</div>
                     <p><strong>Price:</strong> ₱{prop.price}</p>
-                    <p><strong>Rooms Available:</strong> {prop.availableRooms}</p>
+                    <p><strong>Rooms Available:</strong> {prop.rooms?.length || 'N/A'}</p>
                     <p><strong>Area:</strong> {prop.area} sq ft</p>
                     <button
                       className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
@@ -251,9 +288,6 @@ const BookProperty = () => {
           </Slider>
         </div>
 
-        <br />
-
-        {/* Footer Section */}
         <div className="py-6 text-center">
           <p className="text-gray-600">All rights reserved.</p>
         </div>
