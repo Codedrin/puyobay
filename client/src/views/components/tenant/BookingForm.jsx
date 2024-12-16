@@ -47,11 +47,12 @@ const BookingForm = () => {
                 console.error('Error fetching property:', error);
                 toast.error('Failed to fetch property details');
             }
-        };
+        }; 
 
         fetchProperty();
     }, [propertyId]);
 
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -254,20 +255,27 @@ const BookingForm = () => {
 
                     {/* Room Dropdown */}
                     <div>
-                        <select
-                            name="selectedRoom"
-                            className="w-full border px-3 py-2 rounded"
-                            value={selectedRoom}
-                            onChange={(e) => setSelectedRoom(e.target.value)}
-                            required
-                        >
-                            <option value="">Select Room</option>
-                            {property?.rooms?.map((room, index) => (
-                                <option key={index} value={room.roomName}>
-                                    {room.roomName} - {room.roomArea} sq ft - ₱{room.price}
-                                </option>
-                            ))}
-                        </select>
+                    <select
+                        name="selectedRoom"
+                        className="w-full border px-3 py-2 rounded"
+                        value={selectedRoom}
+                        onChange={(e) => setSelectedRoom(e.target.value)}
+                        required
+                    >
+                        <option value="">Select Room</option>
+                        {property?.rooms?.map((room) => (
+                            <option
+                                key={room.roomName}
+                                value={room.roomName}
+                                disabled={room.availablePersons <= 0} // Disable if no available persons
+                            >
+                                {room.availablePersons > 0
+                                    ? `${room.roomName} - ${room.roomArea} sq ft - ₱${room.price} (${room.availablePersons} persons available)`
+                                    : `${room.roomName} - Fully Booked`}
+                            </option>
+                        ))}
+                    </select>
+
                     </div>
                     <button
                         type="submit"

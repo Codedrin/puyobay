@@ -49,6 +49,8 @@ const BookProperty = () => {
     fetchOtherProperties();
   }, [propertyId]);
 
+
+
   const submitRating = async () => {
     if (!user) {
       toast.error('You must be logged in to submit a rating');
@@ -97,6 +99,12 @@ const BookProperty = () => {
     navigate(`/book-property/${propertyId}`);
   };
 
+      // Check if all rooms are fully booked
+      const allRoomsFullyBooked =
+      property.rooms?.length > 0 &&
+      property.rooms.every((room) => room.availablePersons <= 0);
+
+      
   const handleBookingForm = () => {
     navigate(`/book-house/${propertyId}`);
   };
@@ -171,8 +179,11 @@ const BookProperty = () => {
           </div>
 
           <div className="md:w-1/2">
-            <p>
-              <strong>Available Rooms:</strong> {property.rooms?.length > 0 ? property.rooms.length : 'No available rooms'}
+          <p>
+              <strong>Available Rooms:</strong>{' '}
+              {allRoomsFullyBooked || property.rooms?.length === 0
+                ? 'No available rooms'
+                : `${property.rooms.length} room(s) available`}
             </p>
             <p><strong>Price:</strong> ₱{property.price}</p>
             <p><strong>Details:</strong> {property.description}</p>
@@ -188,12 +199,15 @@ const BookProperty = () => {
               </button>
 
               <button
-                className={`px-4 py-2 rounded text-white 
-                ${property.rooms?.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`px-4 py-2 rounded text-white ${
+                  allRoomsFullyBooked
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-600'
+                }`}
                 onClick={handleBookingForm}
-                disabled={property.rooms?.length === 0}
+                disabled={allRoomsFullyBooked}
               >
-                Book Now
+                {allRoomsFullyBooked ? 'All Rooms Fully Booked' : 'Book Now'}
               </button>
             </div>
           </div>

@@ -35,6 +35,15 @@ export const processBooking = async (req, res) => {
     if (!room) {
       return res.status(400).json({ message: 'Selected room does not exist in the property' });
     }
+
+     // Check for available persons
+     if (room.availablePersons < persons) {
+      return res.status(400).json({ 
+        message: `Not enough space in the room. Available persons: ${room.availablePersons}` 
+      });
+    }
+
+
     // Payment-related logic
     let receipt = { publicId: '', url: '' };
     if (paymentMethod === 'GCash' && paymentDetails.receipt) {
@@ -62,13 +71,23 @@ export const processBooking = async (req, res) => {
       paymentDetails: {
         referenceNumber: paymentMethod === 'GCash' ? paymentDetails.referenceNumber : null,
         mobileNumberUsed: paymentMethod === 'GCash' ? paymentDetails.mobileNumberUsed : null,
-        senderName: paymentMethod === 'GCash' ? paymentDetails.senderName : null,
+        senderName: paymentMethod === 'GCash' ? paymentDetails.senderName :  null,
         receipt,
       },
       status: false,  // Booking is not approved initially
       adminShare,
       netIncome,
     };
+
+    // Deduct persons from availablePersons in the room
+    room.availablePersons -= persons;
+
+        // Prevent negative values (edge case)
+    if (room.availablePersons < 0) {
+      room.availablePersons = 0;
+    }
+    
+    await property.save();
 
     // Check if the property has existing bookings
     let bookedProperty = await BookedProperty.findOne({ property: propertyId });
