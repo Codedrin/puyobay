@@ -13,7 +13,7 @@ import { addProperty,
 import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantProfileController.js';
 import { getAllProperties, getPropertyCount } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
-import { processBooking, cancelBooking, getBookingsByUserId  } from '../controllers/processBooking.js';
+import { processBooking, cancelBooking, getBookingsByUserId, getAllBookings } from '../controllers/processBooking.js';
 import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
 import { resetPassword, getBusinessDetails,updateBusinessDetails } from '../controllers/userController.js';
@@ -31,6 +31,8 @@ router.get('/', getUsersByType);
 router.delete('/deny/:landlordId', denyLandlord);
 router.get('/landlords/income', getLandlordIncomeByMonth);
 router.get('/get-property-count', getPropertyCount)
+router.get('/bookings/all', getAllBookings);
+
 // Route to toggle approval status
 router.put('/approve/:landlordId', toggleApprovalStatus);
 

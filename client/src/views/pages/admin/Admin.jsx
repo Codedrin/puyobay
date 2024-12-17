@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // Import FontAwesome icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faUsers, faFileInvoiceDollar } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faUsers, faFileInvoiceDollar, faHistory } from '@fortawesome/free-solid-svg-icons';
 
 const Admin = () => {
   const [landlords, setLandlords] = useState([]);
@@ -86,17 +86,27 @@ const Admin = () => {
               <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-3xl mr-4" />
               <div>
                 <h3 className="text-lg font-semibold">Reports</h3>
-                {/* Handle totalPayments being undefined or null */}
-                {/* <p className="text-2xl">{totalPayments !== null && totalPayments !== undefined ? totalPayments.toFixed(2) : ''}</p> */}
               </div>
             </div>
             <a href="/admin/reports" className="text-white underline">View Payments</a>
           </div>
-        </div>
 
+          {/* New History Card */}
+          <div className="bg-purple-500 text-white rounded-lg shadow p-4">
+            <div className="flex items-center">
+              <FontAwesomeIcon icon={faHistory} className="text-3xl mr-4" />
+              <div>
+                <h3 className="text-lg font-semibold">History</h3>
+                <p className="text-2xl">View All Activities</p>
+              </div>
+            </div>
+            <a href="/admin/history" className="text-white underline">View History</a>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Admin;
+  

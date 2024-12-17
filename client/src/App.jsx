@@ -20,6 +20,7 @@ import LandlordAdmin from './views/pages/admin/LandlordAdmin.jsx';
 import TenantAdmin from './views/pages/admin/TenantAdmin.jsx';
 import HousesAdmin from './views/pages/admin/HousesAdmin.jsx';
 import Reports from './views/pages/admin/Reports.jsx';
+import History from './views/pages/admin/History.jsx';
 //Landlord
 import LandlordPage from './views/pages/landlord/LandlordPage.jsx';
 import LandlordViewProfile from './views/pages/landlord/LandlordViewProfile.jsx';
@@ -57,6 +58,7 @@ const App = () => {
         <Route path="/admin/tenant" element={<TenantAdmin /> }/>
         <Route path="/admin/house" element={<HousesAdmin /> }/>
         <Route path="/admin/reports" element={<Reports /> }/>
+        <Route path="/admin/history" element={<History /> }/>
       {/* Landlord Page */}
       <Route path="/landlord" element={<ProtectedRoute> <LandlordPage /> </ProtectedRoute>} />
       <Route path="/landlord-profile" element={<ProtectedRoute> <LandlordViewProfile /> </ProtectedRoute>} />

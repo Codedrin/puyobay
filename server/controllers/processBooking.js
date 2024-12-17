@@ -354,3 +354,48 @@ export const getBookingsByUserId = async (req, res) => {
     }
   };
   
+  //Admin History
+
+export const getAllBookings = async (req, res) => {
+  try {
+    // Fetch all properties with bookings, populate user (tenant) and property details
+    const allBookings = await BookedProperty.find()
+      .populate('property', 'propertyName') // Populate property details
+      .populate('bookings.user', 'firstName lastName email') // Populate tenant details
+      .lean(); // Convert to plain JS object for better handling
+
+    // Flatten bookings and prepare the final response
+    const bookings = allBookings.flatMap((bookedProperty) =>
+      bookedProperty.bookings.map((booking) => ({
+        propertyName: bookedProperty.property?.propertyName || 'N/A',
+        tenantName: booking.user
+          ? `${booking.user.firstName} ${booking.user.lastName}`
+          : 'N/A',
+        tenantEmail: booking.user?.email || 'N/A',
+        checkInDate: booking.checkInDate,
+        checkOutDate: booking.checkOutDate,
+        phoneNumber: booking.phoneNumber,
+        paymentMethod: booking.paymentMethod,
+        status: booking.status ? 'Confirmed' : 'Pending',
+        cancellations: booking.cancellations, // Include cancellations if any
+        createdAt: booking.createdAt,
+      }))
+    );
+
+    // Return response
+    res.status(200).json({
+      success: true,
+      totalBookings: bookings.length,
+      bookings,
+    });
+  } catch (error) {
+    console.error('Error fetching all bookings:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error. Could not fetch all bookings.',
+      error: error.message,
+    });
+  }
+};
+
+  
