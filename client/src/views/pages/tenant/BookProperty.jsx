@@ -13,6 +13,7 @@ const BookProperty = () => {
   const [property, setProperty] = useState(null);
   const [otherProperties, setOtherProperties] = useState([]);
   const [rating, setRating] = useState(0);
+
   const navigate = useNavigate();
 
   const getUserFromLocalStorage = () => {

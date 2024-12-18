@@ -50,7 +50,23 @@ const LandlordDashboard = () => {
   const handlePrint = () => {
     window.print();
   };
-
+  const terminateBooking = async (bookingId) => {
+    const reason = prompt('Enter reason for termination:');
+    if (!reason) return;
+  
+    try {
+      await axios.put(`http://localhost:5000/api/users/terminate-booking/${bookingId}`, {
+        cancellationReason: reason,
+      });
+      alert('Booking terminated successfully!');
+      // Refresh dashboard data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error terminating booking:', error);
+      alert('Failed to terminate booking.');
+    }
+  };
+  
   return (
     <div>
       <LandlordNavbar />
@@ -80,16 +96,33 @@ const LandlordDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {dashboardData.tenants.map((tenant) => (
-                <tr key={tenant.userId}>
-                  <td className="border border-gray-200 p-2">{tenant.userId}</td>
-                  <td className="border border-gray-200 p-2">{tenant.name}</td>
-                  <td className="border border-gray-200 p-2">{new Date(tenant.checkInDate).toLocaleDateString()}</td>
-                  <td className="border border-gray-200 p-2">{new Date(tenant.checkOutDate).toLocaleDateString()}</td>
-                  <td className="border border-gray-200 p-2">{tenant.email}</td>
-                </tr>
-              ))}
-            </tbody>
+  {dashboardData.tenants.map((tenant) => (
+    <tr key={tenant.userId}>
+      <td className="border border-gray-200 p-2">{tenant.userId}</td>
+      <td className="border border-gray-200 p-2">{tenant.name}</td>
+      <td className="border border-gray-200 p-2">
+        {new Date(tenant.checkInDate).toLocaleDateString()}
+      </td>
+      <td className="border border-gray-200 p-2">
+        {new Date(tenant.checkOutDate).toLocaleDateString()}
+      </td>
+      <td className="border border-gray-200 p-2">{tenant.email}</td>
+      <td className="border border-gray-200 p-2">
+        {tenant.status === 'Terminated' ? (
+          <span className="text-red-500">Terminated</span>
+        ) : (
+          <button
+            onClick={() => terminateBooking(tenant.bookingId)}
+            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+          >
+            Terminate
+          </button>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
 

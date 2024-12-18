@@ -17,7 +17,8 @@ const TenantViewProfile = () => {
   const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [bookingLoading, setBookingLoading] = useState(true);
-
+  const [canceledBookings, setCanceledBookings] = useState([]); // State for canceled bookings
+  const [canceledLoading, setCanceledLoading] = useState(true); // Loading state for canceled bookings
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
 
@@ -39,16 +40,26 @@ const TenantViewProfile = () => {
     const fetchBookings = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/users/bookings/${userId}`);
-        setBookings(response.data.bookings);
+        const allBookings = response.data.bookings;
+  
+        // Separate canceled bookings and active bookings
+        const canceled = allBookings.filter((booking) => booking.cancellations?.length > 0);
+        const active = allBookings.filter((booking) => !booking.cancellations?.length);
+  
+        setCanceledBookings(canceled); // Update canceled bookings state
+        setBookings(active); // Update active bookings state
       } catch (error) {
         console.error('Error fetching bookings:', error);
       } finally {
         setBookingLoading(false);
+        setCanceledLoading(false);
       }
     };
     fetchBookings();
   }, [userId]);
+  
 
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -268,6 +279,8 @@ const TenantViewProfile = () => {
         </div>
       )}
 
+
+      
       {/* Reservations Section */}
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-semibold mb-4 text-blue-700">Previous Reservations</h2>
@@ -286,6 +299,8 @@ const TenantViewProfile = () => {
                   <span className="font-semibold text-lg">{booking.propertyName}</span>
                   <span>{expandedIndex === index ? '⌄' : '⌃'}</span>
                 </button>
+
+
 
                 {/* Conditionally render the details with smooth transition */}
                 <div
@@ -309,6 +324,7 @@ const TenantViewProfile = () => {
                 </div>
               </div>
             ))}
+            
           </div>
         )}
       </div>
@@ -354,6 +370,27 @@ const TenantViewProfile = () => {
         <p>View and manage your favorite properties here.</p>
       </div>
 
+                  {/* Canceled Bookings Section */}
+                  <div className="container mx-auto p-4">
+                  <h2 className="text-2xl font-semibold mb-4 ">History of Canceled Bookings</h2>
+                  {canceledLoading ? (
+                    <p>Loading canceled bookings...</p>
+                  ) : canceledBookings.length === 0 ? (
+                    <p>No canceled bookings found.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {canceledBookings.map((booking, index) => (
+                        <div key={index} className="bg-white rounded-lg border px-4 py-4">
+                          <p><strong>Property Name:</strong> {booking.propertyName}</p>
+                          <p><strong>Check-in:</strong> {formatDate(booking.checkInDate)}</p>
+                          <p><strong>Check-out:</strong> {formatDate(booking.checkOutDate)}</p>
+                          <p><strong>Reason for Cancellation:</strong> {booking.cancellations[0]?.cancellationReason || 'N/A'}</p>
+                          <p><strong>Date of Cancellation:</strong> {formatDate(booking.cancellations[0]?.canceledAt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
       <ToastContainer />
     </div>
   );

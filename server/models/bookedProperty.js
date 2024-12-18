@@ -23,6 +23,7 @@ const bookingSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+
   age: {
     type: String,
     required: true,

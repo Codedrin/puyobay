@@ -14,7 +14,7 @@ import { getUserProfile, updateTenantUserProfile } from '../controllers/tenantPr
 import { getAllProperties, getPropertyCount } from '../controllers/getAllproperties.js';
 import { getBookPropertyById, submitRating, getAverageRatings } from '../controllers/bookProperties.js';
 import { processBooking, cancelBooking, getBookingsByUserId, getAllBookings } from '../controllers/processBooking.js';
-import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData } from '../controllers/LandlordViewBooking.js';
+import { getBookingsByLandlord, updateBookingStatus, getLandlordDashboardData} from '../controllers/LandlordViewBooking.js';
 import { verifyOtp, resendOtp } from '../controllers/userOTPcontroller.js';
 import { resetPassword, getBusinessDetails,updateBusinessDetails } from '../controllers/userController.js';
 import { getLandlordIncomeByMonth } from '../controllers/processBooking.js';
@@ -43,6 +43,7 @@ router.post('/add-property/:id',  addProperty);
 router.get('/landlord-property/:id',  getPropertiesByUser); 
 router.get('/:propertyId/rooms', getRoomsByPropertyId);
 router.put('/:propertyId/rooms/:roomId', updateRoomById);
+router.put('/terminate-booking/:bookingId');
 router.delete('/:propertyId/rooms/:roomId', removeRoomById);
 router.get('/property/:id',  getPropertyById);
 router.get('/landlords/business-details/:landlordId', getBusinessDetails);

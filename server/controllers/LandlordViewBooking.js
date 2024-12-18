@@ -91,8 +91,8 @@ export const updateBookingStatus = async (req, res) => {
         }
 
         // Check if there are available rooms to deduct
-        if (property.availableRooms > 0) {
-          property.availableRooms -= 1; // Decrease the available rooms by 1
+        if (property.persons > 0) {
+          property.persons -= 1; // Decrease the available rooms by 1
         } else {
           return res.status(400).json({ message: 'No available rooms to approve this booking' });
         }
@@ -255,3 +255,29 @@ export const getLandlordDashboardData = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+// //Landlord to terminate or canel the booking of the tenant
+// export const terminateBooking = async (req, res) => {
+//   const { bookingId } = req.params;
+//   const { cancellationReason } = req.body;
+
+//   try {
+//     const booking = await BookedProperty.findOne({ 'bookings._id': bookingId });
+//     if (!booking) {
+//       return res.status(404).json({ message: 'Booking not found' });
+//     }
+
+//     // Find the specific booking in the array and push cancellation data
+//     const bookingItem = booking.bookings.id(bookingId);
+//     bookingItem.cancellations.push({
+//       cancellationReason,
+//       canceledAt: new Date(),
+//     });
+
+//     await booking.save();
+
+//     res.status(200).json({ message: 'Booking terminated successfully', booking });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error terminating booking', error });
+//   }
+// };
