@@ -262,6 +262,7 @@ const BookingForm = () => {
                         onChange={(e) => setSelectedRoom(e.target.value)}
                         required
                     >
+                
                         <option value="">Select Room</option>
                         {property?.rooms?.map((room) => (
                             <option

@@ -144,6 +144,7 @@ export const cancelBooking = async (req, res) => {
     // Check if the booking was marked as paid
     const wasPaid = booking.status === true;
 
+
     // Mark the booking as canceled and reset income fields
     booking.status = false;  // Mark as canceled
     booking.adminShare = 0;  // Reset admin share
@@ -195,9 +196,6 @@ export const cancelBooking = async (req, res) => {
     res.status(500).json({ message: 'Error canceling booking', error });
   }
 };
-
-
-
 
 
 // Controller to get all bookings by user ID

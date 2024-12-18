@@ -23,7 +23,6 @@ const bookingSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-
   age: {
     type: String,
     required: true,
@@ -49,6 +48,11 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  selectedRoom: {  // <-- Added selectedRoom
+    type: String,
+    required: true,
+    trim: true,
+  },
   paymentMethod: {
     type: String,
     required: true,
@@ -57,54 +61,52 @@ const bookingSchema = new mongoose.Schema({
   paymentDetails: {
     referenceNumber: {
       type: String,
-      required: function() {
+      required: function () {
         return this.paymentMethod === 'GCash'; 
       },
     },
     mobileNumberUsed: {
       type: String,
-      required: function() {
+      required: function () {
         return this.paymentMethod === 'GCash';
       },
     },
     senderName: {
       type: String,
-      required: function() {
+      required: function () {
         return this.paymentMethod === 'GCash';
       },
     },
     receipt: {
       publicId: {
         type: String,
-        required: function() {
+        required: function () {
           return this.paymentMethod === 'GCash';
         },
       },
       url: {
         type: String,
-        required: function() {
+        required: function () {
           return this.paymentMethod === 'GCash'; 
         },
-      }
-    }
+      },
+    },
   },
   status: {
     type: Boolean, 
     default: false, 
   },
-
   cancellations: [cancellationSchema], // Array of cancellation events
 
-
-adminShare: {
-  type: Number,
-  default: 0,  // Store the admin's 10% share
-},
-netIncome: {
-  type: Number,
-  default: 0,  // Store the net income for the landlord after deduction
-},
-},{
+  adminShare: {
+    type: Number,
+    default: 0,  // Store the admin's 10% share
+  },
+  netIncome: {
+    type: Number,
+    default: 0,  // Store the net income for the landlord after deduction
+  },
+}, {
   timestamps: true, 
 });
 
@@ -121,8 +123,6 @@ const bookedPropertySchema = new mongoose.Schema({
   timestamps: true,
 });
 
-
 const BookedProperty = mongoose.model('BookedProperty', bookedPropertySchema);
 
 export default BookedProperty;
-

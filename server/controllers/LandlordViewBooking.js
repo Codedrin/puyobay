@@ -65,78 +65,99 @@ export const updateBookingStatus = async (req, res) => {
   const { bookingId } = req.params; // Get the booking ID from params
   const { status, tenantEmail, tenantName } = req.body; // Status, tenant email, and name from request body
 
+  console.log(`Received request to update booking status: BookingID=${bookingId}, Status=${status}`);
+  console.log(`Tenant Details: Email=${tenantEmail}, Name=${tenantName}`);
+
   try {
     // Find the booking by ID
     const booking = await BookedProperty.findOne({ 'bookings._id': bookingId });
+    console.log(`Booking lookup result: ${booking ? 'Booking found' : 'Booking not found'}`);
+
     if (!booking) {
+      console.error(`Booking with ID ${bookingId} not found.`);
       return res.status(404).json({ message: 'Booking not found' });
     }
 
     // Find the specific booking index
     const bookingIndex = booking.bookings.findIndex((b) => b._id.toString() === bookingId);
+    console.log(`Booking index in array: ${bookingIndex}`);
+
     if (bookingIndex > -1) {
-      const isConfirmed = status === 'Confirmed'; // Set booking as confirmed based on status
+      const isConfirmed = status === 'Confirmed';
+      console.log(`Booking confirmation status: ${isConfirmed}`);
 
       // Update the isConfirmed field for tracking confirmation
-      booking.bookings[bookingIndex].isConfirmed = isConfirmed; 
+      booking.bookings[bookingIndex].isConfirmed = isConfirmed;
 
-      // Update the actual booking status to true (indicating it's paid or confirmed)
-      booking.bookings[bookingIndex].status = isConfirmed; // Set status to true if confirmed
+      // Update the actual booking status
+      booking.bookings[bookingIndex].status = isConfirmed;
 
       if (isConfirmed) {
+        console.log('Booking is confirmed. Updating property room availability.');
+
         // Find the property associated with the booking
         const property = await Property.findById(booking.property);
+        console.log(`Property lookup result: ${property ? 'Property found' : 'Property not found'}`);
+
         if (!property) {
+          console.error(`Property with ID ${booking.property} not found.`);
           return res.status(404).json({ message: 'Property not found' });
         }
 
-        // Check if there are available rooms to deduct
+        // Check available rooms
         if (property.persons > 0) {
-          property.persons -= 1; // Decrease the available rooms by 1
+          property.persons -= 1;
+          console.log(`Available rooms updated: Remaining Rooms=${property.persons}`);
         } else {
+          console.warn('No available rooms left to approve this booking.');
           return res.status(400).json({ message: 'No available rooms to approve this booking' });
         }
 
         // Save the updated property
         await property.save();
+        console.log('Property updated successfully.');
       }
 
       // Save the updated booking status
       await booking.save();
+      console.log('Booking status updated successfully.');
 
       // Prepare the email message
       let message = isConfirmed
         ? `Dear ${tenantName},\n\nYour booking has been confirmed. We look forward to welcoming you.\n\nBest regards,`
         : `Dear ${tenantName},\n\nWe regret to inform you that your booking has been rejected. Please contact the administrator for further details.\n\nBest regards,`;
 
-      // Include payment details if the booking is confirmed
+      // Include payment details if confirmed
       if (isConfirmed) {
         const paymentMethod = booking.bookings[bookingIndex].paymentMethod;
         const paymentDetails = booking.bookings[bookingIndex].paymentDetails;
 
         message += `\n\nPayment Information:\nPayment Method: ${paymentMethod}\n`;
 
-        // Add specific payment details based on the payment method
         if (paymentMethod === 'GCash') {
           message += `Reference Number: ${paymentDetails.referenceNumber}\n`;
           message += `Mobile Number Used: ${paymentDetails.mobileNumberUsed}\n`;
           message += `Sender Name: ${paymentDetails.senderName}\n`;
         }
 
-        // Include payment status (Paid/Not Paid)
         const isPaid = booking.bookings[bookingIndex].status ? 'Paid' : 'Not Paid';
         message += `\nBooking Payment Status: ${isPaid}\n`;
+
+        console.log('Payment details added to the email message.');
       }
 
+      console.log('Preparing to send email to tenant.');
       // Call the sendEmail function
       await sendEmail({
         email: tenantEmail,
         subject: isConfirmed ? 'Booking Confirmed' : 'Booking Rejected',
-        message, // Pass the message prepared above
+        message,
       });
+      console.log(`Email sent successfully to: ${tenantEmail}`);
 
       res.status(200).json({ message: 'Booking status updated, available room deducted, and email sent to tenant' });
     } else {
+      console.warn(`Booking with ID ${bookingId} not found in the bookings array.`);
       res.status(404).json({ message: 'Booking not found' });
     }
   } catch (error) {
@@ -188,6 +209,7 @@ export const getLandlordDashboardData = async (req, res) => {
         checkInDate: booking.checkInDate,
         checkOutDate: booking.checkOutDate,
         updatedAt: booking.updatedAt, // Track when the booking was updated
+        selectedRoom: booking.selectedRoom
       }))
     );
 
