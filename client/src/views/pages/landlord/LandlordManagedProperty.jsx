@@ -25,7 +25,7 @@ const LandlordManagedProperty = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/landlord-property/${userId}`, {
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/landlord-property/${userId}`, {
           params: { userId },
         });
         setProperties(response.data);
@@ -42,7 +42,7 @@ const LandlordManagedProperty = () => {
     setSelectedPropertyId(propertyId);
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/users/${propertyId}/rooms`);
+      const response = await axios.get(`https://puyobay.onrender.com/api/users/${propertyId}/rooms`);
       setRooms(response.data);
       setIsRoomsModalOpen(true);
     } catch (error) {
@@ -67,7 +67,7 @@ const LandlordManagedProperty = () => {
     if (window.confirm('Are you sure you want to delete this property?')) {
       setLoadingButton(propertyId);
       try {
-        await axios.delete(`http://localhost:5000/api/users/delete-property/${propertyId}`);
+        await axios.delete(`https://puyobay.onrender.com/api/users/delete-property/${propertyId}`);
         toast.success('Property deleted successfully!');
         setProperties(properties.filter((property) => property._id !== propertyId));
       } catch (error) {
@@ -127,7 +127,7 @@ const LandlordManagedProperty = () => {
       };
 
       const response = await axios.put(
-        `http://localhost:5000/api/users/${selectedPropertyId}/rooms/${editableRoom._id}`,
+        `https://puyobay.onrender.com/api/users/${selectedPropertyId}/rooms/${editableRoom._id}`,
         updatedRoom
       );
 
@@ -149,7 +149,7 @@ const LandlordManagedProperty = () => {
     if (window.confirm('Are you sure you want to remove this room?')) {
       setLoadingButton(roomId);
       try {
-        await axios.delete(`http://localhost:5000/api/users/${selectedPropertyId}/rooms/${roomId}`);
+        await axios.delete(`https://puyobay.onrender.com/api/users/${selectedPropertyId}/rooms/${roomId}`);
         toast.success('Room removed successfully!');
         setRooms((prevRooms) => prevRooms.filter((room) => room._id !== roomId));
       } catch (error) {

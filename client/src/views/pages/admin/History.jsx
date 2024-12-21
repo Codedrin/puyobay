@@ -12,7 +12,7 @@ const History = () => {
   useEffect(() => {
     const fetchCanceledBookings = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/bookings/all`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/bookings/all`);
   
         console.log('API Response:', response.data); // Debug API response
   

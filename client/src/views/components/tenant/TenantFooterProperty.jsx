@@ -13,7 +13,7 @@ const TenantFooterProperty = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/get-properties`);
+        const response = await fetch(`https://puyobay.onrender.com/api/users/get-properties`);
         const data = await response.json();
         const enrichedData = data.map((property) => ({
           ...property,
