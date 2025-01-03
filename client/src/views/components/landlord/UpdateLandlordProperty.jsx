@@ -28,7 +28,7 @@ const UpdateLandlordProperty = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/property/${id}`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/property/${id}`);
         setPropertyData(response.data);
       } catch (error) {
         console.error('Error fetching property data:', error);
@@ -91,7 +91,7 @@ const UpdateLandlordProperty = () => {
       };
 
       // Send update request
-      await axios.put(`http://localhost:5000/api/users/update-property/${id}`, updatedData);
+      await axios.put(`https://puyobay.onrender.com/api/users/update-property/${id}`, updatedData);
       setPropertyData(updatedData); // Update local state
       alert('Property updated successfully!');
       navigate('/manage-properties');

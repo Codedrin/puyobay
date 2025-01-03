@@ -37,7 +37,7 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`http://localhost:5000/api/users/reset-password`, {
+      const response = await axios.post(`https://puyobay.onrender.com/api/users/reset-password`, {
         userId,
         newPassword,
         confirmPassword,

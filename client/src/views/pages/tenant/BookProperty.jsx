@@ -27,7 +27,7 @@ const BookProperty = () => {
     // Fetch property details
     const fetchPropertyDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/get-propertiesId/${propertyId}`);
+        const response = await fetch(`https://puyobay.onrender.com/api/users/get-propertiesId/${propertyId}`);
         const data = await response.json();
         setProperty(data);
       } catch (error) {
@@ -38,7 +38,7 @@ const BookProperty = () => {
     // Fetch other properties for the carousel
     const fetchOtherProperties = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/get-properties`);
+        const response = await fetch(`https://puyobay.onrender.com/api/users/get-properties`);
         const data = await response.json();
         setOtherProperties(data.slice(0, 5)); // Limit to 5 properties
       } catch (error) {
@@ -59,7 +59,7 @@ const BookProperty = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/submitrating/${propertyId}/rate`, {
+      const response = await fetch(`https://puyobay.onrender.com/api/users/submitrating/${propertyId}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

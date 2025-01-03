@@ -26,7 +26,7 @@ const LandlordDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/landlord-dashboard/${landlordId}`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/landlord-dashboard/${landlordId}`);
         setDashboardData(response.data);
         setLoading(false);
       } catch (error) {
@@ -55,7 +55,7 @@ const LandlordDashboard = () => {
     if (!reason) return;
   
     try {
-      await axios.put(`http://localhost:5000/api/users/terminate-booking/${bookingId}`, {
+      await axios.put(`https://puyobay.onrender.com/api/users/terminate-booking/${bookingId}`, {
         cancellationReason: reason,
       });
       alert('Booking terminated successfully!');

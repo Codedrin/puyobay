@@ -16,7 +16,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users`);
         setLandlords(response.data.landlords);
         setTotalLandlords(response.data.totalLandlords); // Fetch total landlords from the backend
         setTotalTenants(response.data.totalTenants); // Fetch total tenants from the backend
@@ -28,7 +28,7 @@ const Admin = () => {
 
     const fetchProperties = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/get-property-count`);
+        const response = await axios.get(`https://puyobay.onrender.com/api/users/get-property-count`);
         setTotalHouses(response.data.totalProperties); // Fetch total houses (properties)
       } catch (error) {
         console.error('Error fetching properties:', error);

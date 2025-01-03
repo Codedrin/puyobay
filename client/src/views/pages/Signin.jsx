@@ -36,7 +36,7 @@ const Login = () => {
       }
   
       // Send login request with email, password, and accountType
-      const response = await axios.post(`http://localhost:5000/api/users/login`, 
+      const response = await axios.post(`https://puyobay.onrender.com/api/users/login`, 
         {
           email,
           password,
