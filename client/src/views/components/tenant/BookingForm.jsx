@@ -38,18 +38,6 @@
             const userId = user ? user.id : null;  
 
 
-<<<<<<< HEAD
-            useEffect(() => {
-                const fetchProperty = async () => {
-                    try {
-                        const response = await axios.get(`http://localhost:5000/api/users/property/${propertyId}`);
-                        setProperty(response.data);
-                    } catch (error) {
-                        console.error('Error fetching property:', error);
-                        toast.error('Failed to fetch property details');
-                    }
-                }; 
-=======
     useEffect(() => {
         const fetchProperty = async () => {
             try {
@@ -60,7 +48,6 @@
                 toast.error('Failed to fetch property details');
             }
         }; 
->>>>>>> ec66a2e63447c94be2f384e79b3fcf5b426bf058
 
                 fetchProperty();
             }, [propertyId]);
@@ -80,7 +67,6 @@
                 }
             };
 
-<<<<<<< HEAD
             const handlePaymentDetailsChange = (e) => {
                 const { name, value, files } = e.target;
                 setPaymentDetails((prevDetails) => ({
@@ -88,9 +74,6 @@
                     [name]: files ? files[0] : value,
                 }));
             };
-=======
-            const response = await axios.post(`https://puyobay.onrender.com/api/users/process-booking`, bookingData);
->>>>>>> ec66a2e63447c94be2f384e79b3fcf5b426bf058
 
             const uploadFileToCloudinary = async (file) => {
                 const formData = new FormData();
@@ -149,7 +132,7 @@
                         },
                     };
 
-                    const response = await axios.post(`http://localhost:5000/api/users/process-booking`, bookingData);
+                    const response = await axios.post(`https://puyobay.onrender.com/api/users/process-booking`, bookingData);
 
                     if (response.status === 201) {
                         toast.success('Booking processed successfully. Please wait for the confirmation email.');
