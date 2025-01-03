@@ -24,7 +24,7 @@ const bookingSchema = new mongoose.Schema({
     trim: true,
   },
   age: {
-    type: String,
+    type: Number,
     required: true,
   },
   gender: {
@@ -45,7 +45,7 @@ const bookingSchema = new mongoose.Schema({
     required: true,
   },
   persons: {
-    type: String,
+    type: Number,
     required: true,
   },
   selectedRoom: {  // <-- Added selectedRoom

@@ -21,11 +21,13 @@ export const processBooking = async (req, res) => {
     selectedRoom,
   } = req.body;
 
+  console.log('Received booking request:', req.body);
+
   try {
     // Find the user and property by their IDs
     const user = await User.findById(userId);
     const property = await Property.findById(propertyId);
-    
+
     if (!user || !property) {
       return res.status(404).json({ message: 'User or Property not found' });
     }
@@ -33,23 +35,44 @@ export const processBooking = async (req, res) => {
     // Check if the selected room exists in the property
     const room = property.rooms.find((r) => r.roomName === selectedRoom);
     if (!room) {
+      console.log('Selected room does not exist in the property:', selectedRoom);
       return res.status(400).json({ message: 'Selected room does not exist in the property' });
     }
 
-     // Check for available persons
-     if (room.availablePersons < persons) {
+    // Check for available persons
+    if (room.availablePersons < persons) {
       return res.status(400).json({ 
         message: `Not enough space in the room. Available persons: ${room.availablePersons}` 
       });
     }
 
-
-    // Payment-related logic
-    let receipt = { publicId: '', url: '' };
-    if (paymentMethod === 'GCash' && paymentDetails.receipt) {
-      receipt.publicId = paymentDetails.receipt.publicId;
-      receipt.url = paymentDetails.receipt.url;
+    // Deduct persons from availablePersons in the room
+    room.availablePersons -= persons;
+    if (room.availablePersons < 0) {
+      room.availablePersons = 0;
     }
+
+    // Payment-related logic (GCash only)
+    let paymentDetailsProcessed = {};
+    if (paymentMethod === 'GCash') {
+      paymentDetailsProcessed = {
+        referenceNumber: paymentDetails.referenceNumber,
+        mobileNumberUsed: paymentDetails.mobileNumberUsed,
+        senderName: paymentDetails.senderName,
+        receipt: {
+          publicId: paymentDetails.receipt.publicId,
+          url: paymentDetails.receipt.url,
+        },
+      };
+    }
+
+    let receipt = { publicId: '', url: '' };
+    if (paymentMethod === 'GCash' && paymentDetailsProcessed.receipt) {
+      receipt.publicId = paymentDetailsProcessed.receipt.publicId;
+      receipt.url = paymentDetailsProcessed.receipt.url;
+    }
+
+    console.log('Payment method and details processed:', paymentMethod);
 
     // Admin share and net income calculations
     const totalIncome = room.price || property.price; 
@@ -68,25 +91,15 @@ export const processBooking = async (req, res) => {
       persons,
       paymentMethod,
       selectedRoom,
-      paymentDetails: {
-        referenceNumber: paymentMethod === 'GCash' ? paymentDetails.referenceNumber : null,
-        mobileNumberUsed: paymentMethod === 'GCash' ? paymentDetails.mobileNumberUsed : null,
-        senderName: paymentMethod === 'GCash' ? paymentDetails.senderName :  null,
-        receipt,
-      },
+      paymentDetails: paymentMethod === 'GCash' ? paymentDetailsProcessed : {},
       status: false,  // Booking is not approved initially
       adminShare,
       netIncome,
     };
 
-    // Deduct persons from availablePersons in the room
-    room.availablePersons -= persons;
+    console.log('New booking object created:', newBooking);
 
-        // Prevent negative values (edge case)
-    if (room.availablePersons < 0) {
-      room.availablePersons = 0;
-    }
-    
+    // Save the property with updated availablePersons
     await property.save();
 
     // Check if the property has existing bookings
@@ -105,7 +118,6 @@ export const processBooking = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-
 
 
 
